@@ -1,6 +1,23 @@
 from random import randint
 from classes import *
+from math import floor
 import os
+
+# ----------------------- Mapping des pourcentages ------------------------
+
+diceMappings = {
+    1 : 0.65,
+    2 : 0.8,
+    3 : 1,
+    4 : 1,
+    5 : 1.1,
+    6 : 1.25
+}
+
+# -------------------------- Gestion des stats ----------------------------
+
+attackerStatsList = ["mana","hp","def"]
+defenderStatsList = ["atthp","attmana"]
 
 # --------------------------- Lancement de dés -----------------------------
 
@@ -55,6 +72,21 @@ def game_loop(players_stats):
         players_stats[0]["mana"] += mana_roll()
         actual_player ^= 1
 
+def amountDiced(diceNum:int,attackAmount:int) -> int:
+    return floor(attackAmount * diceMappings[diceNum])
+
+def attackRoll(attack:tuple[str,int,dict,str], attackerStats:dict, defenderStats:dict):
+    roll = dice()
+    for i in attack[2].keys():
+        if i in defenderStatsList:
+            defenderStats[i[3:]] = max(0,defenderStats[i[3:]]-amountDiced(roll, attack[2][i]))
+        elif i in attackerStatsList:
+            if i == "mana":
+                attackerStats[i] = min(attackerStats["topMana"],attackerStats[i] + amountDiced(roll,attack[2][i]))
+            else:
+                attackerStats[i] += amountDiced(roll, attack[2][i])
+
+    return attackerStats, defenderStats
 
 def mana_roll():
     
