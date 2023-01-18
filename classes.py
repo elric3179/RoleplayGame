@@ -34,16 +34,16 @@ def attacks(classe) -> tuple:
 #Recupére les stats de base d'un calsse en fonction du nom de cette classe
 #Retourne un dictionnaire sous la forme
 #{"mana": NumMana, "hp": NumHp, "def": NumDef, "topMana": NumTopMana}
-def stats(classe):
+def stats(classe) -> dict:
     match classe:
         case "berseker":
-            return {"mana":0,"hp":100,"def":20,"topMana":40}
+            return {"class":classe,"mana":0,"hp":100,"def":20,"topMana":40}
         case "mage":
-            return {"mana":10,"hp":80,"def":10,"topMana":60}
+            return {"class":classe,"mana":10,"hp":80,"def":10,"topMana":60}
         case "paladin":
-            return {"mana":0,"hp":60,"def":25,"topMana":80}
+            return {"class":classe,"mana":0,"hp":60,"def":25,"topMana":80}
         case "archer":
-            return {"mana": 20, "hp": 75, "def": 15, "topMana": 60}
+            return {"class":classe,"mana": 20, "hp": 75, "def": 15, "topMana": 60}
 
 
 
