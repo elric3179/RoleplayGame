@@ -35,6 +35,9 @@ def roll_dice(dice_number) -> list:
 def dice():
     return randint(1, 6)
 
+def amountDiced(diceNum:int,attackAmount:int) -> int:
+    return floor(attackAmount * diceMappings[diceNum])
+
 # --------------------------- Gestion des classes ---------------------------
 
 # Fonction demandant à l'utilisateur la classe chois
@@ -58,22 +61,7 @@ def start_stat() -> list:
         players_stats_start.append(stats(get_classes(choosen_class[i])))
     return players_stats_start
 
-# -------------------------------- Autres ----------------------------------
-
-def sayToPlayer(num,text) -> str:
-    return f"Player {num}, {text} "
-
-
-def game_loop(players_stats):
-    actual_player = 0
-    while True:
-        os.system("cls")
-        print(sayToPlayer(actual_player + 1, "it's your turn"))
-        players_stats[0]["mana"] += mana_roll()
-        actual_player ^= 1
-
-def amountDiced(diceNum:int,attackAmount:int) -> int:
-    return floor(attackAmount * diceMappings[diceNum])
+# ----------------------------- Competence ----------------------------------
 
 def attackRoll(attack:tuple[str,int,dict,str], attackerStats:dict, defenderStats:dict):
     roll = dice()
@@ -88,16 +76,61 @@ def attackRoll(attack:tuple[str,int,dict,str], attackerStats:dict, defenderStats
 
     return attackerStats, defenderStats
 
+# ----------------------------- Utilitaire ----------------------------------
+
+# Permet de creer un message (texte en argument) a destination d'un joueur donner en argument
+# Retourne un string construit
+def sayToPlayer(num,text) -> str:
+    return f"Player {num}, {text} "
+
+def interface(player_stat, actual_player, message:str):
+    os.system("cls")
+    print("------------", 20*"\t", "-------------------")
+    print("|","Joueur", actual_player + 1, "|", 20*"\t", "|" ,"Mana:", player_stat["mana"], "HP:", player_stat["hp"], "|" )
+    print("------------", 20*"\t", "-------------------")
+    print(2*"\n")
+    
+    
+
+    split_message = message.split("\n")
+    max = 0
+    for i in split_message:
+        if max < len(i):
+            max = len(i)
+
+    print(5*"\t", (max+ 5)*"-")
+
+    for i in range(len(split_message)):
+        print(5*"\t", "|", split_message[i], (max - len(split_message[i]))*" " ,"|")
+
+    print(5*"\t", (max+ 5)*"-")
+
+# --------------------------------- Autre -----------------------------------
+
+def game_loop(players_stats):
+    actual_player = 0
+    while True:
+        turn(actual_player, players_stats)
+        actual_player ^= 1
+
+def turn(actual_player, players_stats):
+
+    roll = mana_roll()
+    players_stats[actual_player]["mana"] += roll[0]
+    interface(players_stats[actual_player], actual_player, roll[1])
+    input()
+
+    
+
+
+
 def mana_roll():
     
-    print("Lancement de dés de mana...")
     dice_result = roll_dice(2)
     total = sum(dice_result)
-    print("Vous avez obtenu", dice_result[0], "et", dice_result[1], "pour un total de", total)
-    return total
+    string_output = f"Lancement de dés de mana... \nVous avez obtenu {dice_result[0]} et {dice_result[1]} pour un total de {total}"
+    return (total, str(string_output))
     
-
-
 
 def play():
     players_stats = start_stat()
@@ -105,3 +138,7 @@ def play():
     game_loop(players_stats)
 
 play()
+
+
+
+#interface({"class":"berseker","mana":0,"hp":100,"def":20,"topMana":40}, 0, "Hey hey")
