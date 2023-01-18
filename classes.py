@@ -24,6 +24,13 @@ def attacks(classe) -> tuple:
                 ("Heal", 8, 20, "The paladin heals themselves for 20 health points", ("hp")),
                 ("Divine Retribution", 20, 25, "The paladin unleashes divine retribution, dealing 25 damage", ("att"))
             )
+        case "archer":
+            return (
+                ("Precise Shot", 8, 10, "The archer fires a precise shot, dealing 10 damage", ("att")),
+                ("Mana Boost", 12, 8, "The archer boosts their mana by 8 points", ("mana")),
+                ("Evasive Maneuvers", 15, 20, "The archer performs evasive maneuvers, increasing their defense by 20 points", ("def")),
+                ("Rain of Arrows", 20, 18, "The archer calls forth a rain of arrows, dealing 15 damage", ("att"))
+            )
         
 #Recupére les stats de base d'un calsse en fonction du nom de cette classe
 #Retourne un dictionnaire sous la forme
@@ -36,3 +43,5 @@ def stats(classe):
             return {"mana":10,"hp":80,"def":10,"topMana":60}
         case "paladin":
             return {"mana":0,"hp":60,"def":25,"topMana":80}
+        case "archer":
+            return {"mana": 20, "hp": 75, "def": 15, "topMana": 60}
