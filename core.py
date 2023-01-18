@@ -16,6 +16,7 @@ def roll_dice(dice_number):
 def dice():
     return randint(1, 6)
 
+# Fonction demandant 
 def ask_classe(player_number):
     classes = get_classes()
     for i in range(len(classes)):
@@ -30,12 +31,10 @@ def classes_selection():
 
 def start_stat():
     choosen_class = classes_selection()
-    print(choosen_class)
     players_stats_start = []
     for i in range(len(choosen_class)):
         players_stats_start.append(stats(get_classes(choosen_class[i])))
     return(players_stats_start)
-    
 
 def play():
     players_stats = start_stat()
