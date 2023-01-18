@@ -1,5 +1,6 @@
 from random import randint
 from classes import *
+import os
 
 
 # Permet de lancer un nombre donné de dés
@@ -18,9 +19,10 @@ def dice():
 
 def ask_classe(player_number):
     classes = get_classes()
+    os.system("cls")
     for i in range(len(classes)):
-        print(str(i + 1) + ": " + str(classes[i]))
-    return int(input("Player " + str(player_number) + ", choose a number: ")) - 1
+        print(str(i + 1) + ": " + str(classes[i]).title())
+    return int(input(sayToPlayer(player_number,"choose a number:"))) - 1
 
 def classes_selection():
     choose_class = []
@@ -28,13 +30,15 @@ def classes_selection():
         choose_class.append(ask_classe(i + 1))
     return choose_class
 
+def sayToPlayer(num,text) -> str:
+    return f"Player {num}, {text} "
+
 def start_stat():
     choosen_class = classes_selection()
-    print(choosen_class)
     players_stats_start = []
     for i in range(len(choosen_class)):
         players_stats_start.append(stats(get_classes(choosen_class[i])))
-    return(players_stats_start)
+    return players_stats_start
     
 
 def play():
