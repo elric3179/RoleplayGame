@@ -31,7 +31,6 @@ def attacks(classe) -> tuple:
                 ("Evasive Maneuvers", 15, 20, "The archer performs evasive maneuvers, increasing their defense by 20 points", ("def")),
                 ("Rain of Arrows", 20, 18, "The archer calls forth a rain of arrows, dealing 15 damage", ("att"))
             )
-        
 #Recupére les stats de base d'un calsse en fonction du nom de cette classe
 #Retourne un dictionnaire sous la forme
 #{"mana": NumMana, "hp": NumHp, "def": NumDef, "topMana": NumTopMana}
