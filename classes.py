@@ -46,6 +46,11 @@ def stats(classe) -> dict:
             return {"class":classe,"mana": 20, "hp": 75, "def": 15, "topMana": 60}
 
 
+def show_classe():
+    classes = get_classes()
+    for i in range(len(classes)):
+        print(str(i + 1) + ": " + str(classes[i]).title())
+
 
 def get_classes(num=None):
     classes_name = ("berseker", "mage", "paladin", "archer")
