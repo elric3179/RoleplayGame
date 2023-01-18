@@ -47,5 +47,10 @@ def stats(classe):
 
 
 
-def get_classes():
-    return ("berseker", "mage", "paladin", "archer")
+def get_classes(num=None):
+    classes_name = ("berseker", "mage", "paladin", "archer")
+    if num != None:
+        return classes_name[num]
+    else:
+        return classes_name
+    
