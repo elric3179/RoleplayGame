@@ -48,4 +48,4 @@ def stats(classe):
 
 
 def get_classes():
-    return ("berseker", "mage", "paladin")
+    return ("berseker", "mage", "paladin", "archer")
