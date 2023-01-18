@@ -36,3 +36,6 @@ def stats(classe):
             return {"mana":10,"hp":80,"def":10,"topMana":60}
         case "paladin":
             return {"mana":0,"hp":60,"def":25,"topMana":80}
+
+def get_classes():
+    return ("berseker", "mage", "paladin")
