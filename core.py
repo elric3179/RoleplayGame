@@ -31,12 +31,13 @@ def classes_selection():
 def start_stat():
     choosen_class = classes_selection()
     print(choosen_class)
-    players_stats = []
+    players_stats_start = []
     for i in range(len(choosen_class)):
-        players_stats.append(stats(get_classes(choosen_class[i])))
-    print(players_stats)
+        players_stats_start.append(stats(get_classes(choosen_class[i])))
+    return(players_stats_start)
+    
 
 def play():
-    start_stat()
+    players_stats = start_stat()
 
 play()
