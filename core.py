@@ -85,14 +85,16 @@ def attackRoll(attack:tuple[str,int,dict,str], attackerStats:dict, defenderStats
 def sayToPlayer(num,text) -> str:
     return f"Player {num}, {text} "
 
+def spaceBetween(other_string, size=os.get_terminal_size().columns) -> str:
+    return int(((size  - other_string)/8))*"\t"
+
 def interface(player_stat, actual_player, message:str):
     os.system("cls")
-    print(green("╭──────────╮ "+ 15*"\t"+ " ╭──────────────────╮"))
-    print(green("│ "+"Joueur "+ str(actual_player + 1)+ " │ "+ 15*"\t"+ " │ " +"Mana: "+ f"{player_stat['mana']:<2}"+ " HP: "+ f"{player_stat['hp']:<3}" + " │" ))
-    print(green("╰──────────╯ "+ 15*"\t"+ " ╰──────────────────╯"))
+    
+    print(green("╭──────────╮ "+ spaceBetween(34) + " ╭──────────────────╮"))
+    print(green("│ "+"Joueur "+ str(actual_player + 1)+ " │ "+ spaceBetween(34)+ " │ " +"Mana: "+ f"{player_stat['mana']:<2}"+ " HP: "+ f"{player_stat['hp']:<3}" + " │" ))
+    print(green("╰──────────╯ "+ spaceBetween(34) + " ╰──────────────────╯"))
     print(2*"\n")
-    
-    
 
     split_message = message.split("\n")
     max = 0
@@ -120,6 +122,8 @@ def turn(actual_player, players_stats):
     roll = mana_roll()
     players_stats[actual_player]["mana"] = min(players_stats[actual_player]["topMana"],players_stats[actual_player]["mana"] + roll[0])
     interface(players_stats[actual_player], actual_player, roll[1])
+    print()
+    print("a\ttest")
     input()
 
     
@@ -138,8 +142,4 @@ def play():
     print(players_stats)
     game_loop(players_stats)
 
-play()
-
-
-
-#interface({"class":"berseker","mana":0,"hp":100,"def":20,"topMana":40}, 0, "Hey hey")
+#play()
