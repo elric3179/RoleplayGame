@@ -87,9 +87,9 @@ def sayToPlayer(num,text) -> str:
 
 def interface(player_stat, actual_player, message:str):
     os.system("cls")
-    print(green("╭──────────╮ "+ 15*"\t"+ " ╭─────────────────╮"))
-    print(green("│ "+"Joueur "+ str(actual_player + 1)+ " │ "+ 15*"\t"+ " │ " +"Mana: "+ str(player_stat["mana"])+ " HP: "+ str(player_stat["hp"]) + " │" ))
-    print(green("╰──────────╯ "+ 15*"\t"+ " ╰─────────────────╯"))
+    print(green("╭──────────╮ "+ 15*"\t"+ " ╭──────────────────╮"))
+    print(green("│ "+"Joueur "+ str(actual_player + 1)+ " │ "+ 15*"\t"+ " │ " +"Mana: "+ f"{player_stat['mana']:<2}"+ " HP: "+ f"{player_stat['hp']:<3}" + " │" ))
+    print(green("╰──────────╯ "+ 15*"\t"+ " ╰──────────────────╯"))
     print(2*"\n")
     
     
