@@ -1,7 +1,7 @@
 #Récupére les attaques disponibles en fonction d'une classe (texte)
 #Retourne un tuple qui contient un tuple par attaque sous la forme
 #("NomCompetence", mana, num, "Description", ("Type"))
-def attacks(classe) -> tuple:
+def competences(classe) -> tuple:
     match classe:
         case "berserker":
             return (

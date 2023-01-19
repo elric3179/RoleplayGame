@@ -111,6 +111,7 @@ def interface(player_stat, actual_player, message:str):
 
 # --------------------------------- Autre -----------------------------------
 
+# Fonction gérant la boucle de jeu et le changement de joueur pour chaque tour
 def game_loop(players_stats):
     actual_player = 0
     while True:
@@ -122,11 +123,21 @@ def turn(actual_player, players_stats):
     roll = mana_roll()
     players_stats[actual_player]["mana"] = min(players_stats[actual_player]["topMana"],players_stats[actual_player]["mana"] + roll[0])
     interface(players_stats[actual_player], actual_player, roll[1])
-    print()
-    print("a\ttest")
+    input()
+    interface(players_stats[actual_player], actual_player, display_competence(players_stats[actual_player]["class"]))
+    select_competences(players_stats[actual_player]["class"])
+
+def select_competences(player_class):
+    selected = input("Choisisez une compétence (numéro): ")
+    print(selected)
     input()
 
-    
+def display_competence(player_class):
+    comp = competences(player_class)
+    display_text = "Competences:"
+    for i in range(len(comp)):
+        display_text += f"\n{i + 1}: {comp[i][0]}, {comp[i][3]}"
+    return display_text
 
 
 
@@ -142,4 +153,4 @@ def play():
     print(players_stats)
     game_loop(players_stats)
 
-#play()
+play()
