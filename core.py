@@ -3,6 +3,8 @@ from classes import *
 from math import floor
 import os
 red         = lambda string: "\033[1;31m" + string + "\033[0;00m"
+green       = lambda string: "\033[1;32m" + string + "\033[0;00m"
+darkgreen       = lambda string: "\033[0;32m" + string + "\033[0;00m"
 # ----------------------- Mapping des pourcentages ------------------------
 
 diceMappings = {
@@ -85,9 +87,9 @@ def sayToPlayer(num,text) -> str:
 
 def interface(player_stat, actual_player, message:str):
     os.system("cls")
-    print(red("╭──────────╮ "+ 15*"\t"+ " ╭─────────────────╮"))
-    print(red("│ "+"Joueur "+ str(actual_player + 1)+ " │ "+ 15*"\t"+ " │ " +"Mana: "+ str(player_stat["mana"])+ " HP: "+ str(player_stat["hp"]) + " │" ))
-    print(red("╰──────────╯ "+ 15*"\t"+ " ╰─────────────────╯"))
+    print(green("╭──────────╮ "+ 15*"\t"+ " ╭─────────────────╮"))
+    print(green("│ "+"Joueur "+ str(actual_player + 1)+ " │ "+ 15*"\t"+ " │ " +"Mana: "+ str(player_stat["mana"])+ " HP: "+ str(player_stat["hp"]) + " │" ))
+    print(green("╰──────────╯ "+ 15*"\t"+ " ╰─────────────────╯"))
     print(2*"\n")
     
     
@@ -125,7 +127,6 @@ def turn(actual_player, players_stats):
 
 
 def mana_roll():
-    
     dice_result = roll_dice(2)
     total = sum(dice_result)
     string_output = f"Lancement de dés de mana... \nVous avez obtenu {dice_result[0]} et {dice_result[1]} pour un total de {total}"
