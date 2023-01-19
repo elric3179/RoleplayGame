@@ -2,7 +2,7 @@ from random import randint
 from classes import *
 from math import floor
 import os
-
+red         = lambda string: "\033[1;31m" + string + "\033[0;00m"
 # ----------------------- Mapping des pourcentages ------------------------
 
 diceMappings = {
@@ -85,9 +85,9 @@ def sayToPlayer(num,text) -> str:
 
 def interface(player_stat, actual_player, message:str):
     os.system("cls")
-    print("------------", 20*"\t", "-------------------")
-    print("|","Joueur", actual_player + 1, "|", 20*"\t", "|" ,"Mana:", player_stat["mana"], "HP:", player_stat["hp"], "|" )
-    print("------------", 20*"\t", "-------------------")
+    print(red("╭──────────╮ "+ 15*"\t"+ " ╭─────────────────╮"))
+    print(red("│ "+"Joueur "+ str(actual_player + 1)+ " │ "+ 15*"\t"+ " │ " +"Mana: "+ str(player_stat["mana"])+ " HP: "+ str(player_stat["hp"]) + " │" ))
+    print(red("╰──────────╯ "+ 15*"\t"+ " ╰─────────────────╯"))
     print(2*"\n")
     
     
@@ -98,12 +98,12 @@ def interface(player_stat, actual_player, message:str):
         if max < len(i):
             max = len(i)
 
-    print(5*"\t", (max+ 5)*"-")
+    print(5*"\t", "╭" + (max+ 3)*"─" + "╮")
 
     for i in range(len(split_message)):
-        print(5*"\t", "|", split_message[i], (max - len(split_message[i]))*" " ,"|")
+        print(5*"\t", "│", split_message[i], (max - len(split_message[i]))*" " ,"│")
 
-    print(5*"\t", (max+ 5)*"-")
+    print(5*"\t", "╰" + (max+ 3)*"─" + "╯")
 
 # --------------------------------- Autre -----------------------------------
 
@@ -116,7 +116,7 @@ def game_loop(players_stats):
 def turn(actual_player, players_stats):
 
     roll = mana_roll()
-    players_stats[actual_player]["mana"] += roll[0]
+    players_stats[actual_player]["mana"] = min(players_stats[actual_player]["topMana"],players_stats[actual_player]["mana"] + roll[0])
     interface(players_stats[actual_player], actual_player, roll[1])
     input()
 
