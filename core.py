@@ -88,6 +88,9 @@ def sayToPlayer(num,text) -> str:
 def spaceBetween(other_string, size=os.get_terminal_size().columns) -> str:
     return int(((size  - other_string)/8))*"\t"
 
+def center(string, size=os.get_terminal_size().columns) -> str:
+    return int(((size / 2) - (len(string) / 2))/8)*"\t" + string
+
 def interface(player_stat, actual_player, message:str):
     os.system("cls")
     
@@ -97,19 +100,21 @@ def interface(player_stat, actual_player, message:str):
     print(2*"\n")
 
     split_message = message.split("\n")
-    max = 0
-    for i in split_message:
-        if max < len(i):
-            max = len(i)
-
-    print(5*"\t", "╭" + (max+ 3)*"─" + "╮")
+    max_len = len(max(split_message, key=len))
+    
+    
+    print(center(("╭" + (max_len)*"─" + "╮")))
 
     for i in range(len(split_message)):
-        print(5*"\t", "│", split_message[i], (max - len(split_message[i]))*" " ,"│")
+        
+        text = "".join(("│", split_message[i], (max_len - len(split_message[i]))*" " ,"│"))
+        print(center(text))
 
-    print(5*"\t", "╰" + (max+ 3)*"─" + "╯")
+    
+    print(center("╰" + (max_len)*"─" + "╯"))
 
 # --------------------------------- Autre -----------------------------------
+
 
 # Fonction gérant la boucle de jeu et le changement de joueur pour chaque tour
 def game_loop(players_stats):
@@ -136,7 +141,7 @@ def display_competence(player_class):
     comp = competences(player_class)
     display_text = "Competences:"
     for i in range(len(comp)):
-        display_text += f"\n{i + 1}: {comp[i][0]}, {comp[i][3]}"
+        display_text += f"\n{i + 1}: {comp[i][0]}, {comp[i][3]} ;  {comp[i][1]} mana"
     return display_text
 
 
