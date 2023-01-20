@@ -5,6 +5,8 @@ import msvcrt
 from math import floor
 from time import sleep
 import os,msvcrt,sys
+
+# ------------------------- Mapping des couleurs --------------------------
 red         = lambda string: "\033[1;31m" + string + "\033[0;00m"
 green       = lambda string: "\033[1;32m" + string + "\033[0;00m"
 darkgreen       = lambda string: "\033[0;32m" + string + "\033[0;00m"
@@ -54,16 +56,14 @@ def ask_classe(player_number):
         show_classe(classIndex)
         sys.stdout.flush()
         char = msvcrt.getch()
-        if char in [b"\n",b"\r",b"\r\n",b"\n\r"]:
-            # Entrée
-            break
-        if char == b"\x00" :
-            # Flèches
-            arrow = msvcrt.getch()
-            if arrow == b"P": # Up
+        match char:
+            case b"P":
                 classIndex = min(3,classIndex+1)
-            if arrow == b"H": # Down
+            case b"H":
                 classIndex = max(0,classIndex-1)
+            case b"\n" | b"\r" | b"\r\n" | b"\n\r":
+                break
+   
     return int(classIndex)
 
 def classes_selection():
@@ -166,25 +166,29 @@ def turn(actual_player, players_stats):
     input()
     competence = None
     while competence == None:
+
         interface(players_stats[0], actual_player, display_competence(players_stats[0]["class"]))
-        competence = select_competences()
+        competence = select_competences(players_stats[0]["class"])   
         if competence == 5:
             # Pour ne pas rentrer dans une erreur avec une cinquième compétence, qui n'existe pas
             pass
-        elif competences(players_stats[0]["class"])[competence][1] > players_stats[0]["mana"]:
+        elif competence[1] > players_stats[0]["mana"]:
             interface(players_stats[0],actual_player,"You do not have enough mana!")
+            input()
         else:
-            players_stats[0]["mana"] -= competences(players_stats[0]["class"])[competence][1]
-            attackRoll(competences(players_stats[0]["class"])[competence])
+            players_stats[0]["mana"] -= competence[1]
+            print(attackRoll(competence, players_stats[0], players_stats[1]))
+            input()
 
 
-def select_competences():
+def select_competences(playerclass):
     numberChoosen = input("Choisisez une compétence (numéro): ")
     if numberChoosen not in ["1","2","3","4","5"]:
         numberChoosen = None
     else:
-        int(numberChoosen) - 1
-    return numberChoosen
+        numberChoosen = int(numberChoosen) - 1
+        
+    return competences(playerclass)[numberChoosen]
 
 def display_competence(player_class):
     comp = competences(player_class)
