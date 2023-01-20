@@ -46,10 +46,14 @@ def stats(classe) -> dict:
             return {"class":classe,"mana": 20, "hp": 75, "def": 15, "topMana": 60}
 
 
-def show_classe():
+def show_classe(index:int):
+    red     = lambda string: "\033[1;31m" + string + "\033[0;00m"
     classes = get_classes()
     for i in range(len(classes)):
-        print(str(i + 1) + ": " + str(classes[i]).title())
+        if index == i:
+            print(red("▶ ") + ": " + str(classes[i]).title())
+        else:
+            print("▶ " + ": " + str(classes[i]).title())
 
 
 def get_classes(num=None):

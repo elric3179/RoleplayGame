@@ -1,7 +1,10 @@
 from random import randint
 from classes import *
+#Reading input from console (arrows)
+import msvcrt
 from math import floor
-import os
+from time import sleep
+import os,msvcrt,sys
 red         = lambda string: "\033[1;31m" + string + "\033[0;00m"
 green       = lambda string: "\033[1;32m" + string + "\033[0;00m"
 darkgreen       = lambda string: "\033[0;32m" + string + "\033[0;00m"
@@ -42,13 +45,26 @@ def amountDiced(diceNum:int,attackAmount:int) -> int:
 
 # --------------------------- Gestion des classes ---------------------------
 
-# Fonction demandant à l'utilisateur la classe chois
-# Retourne un int de 0 à 4 représentant la calsse choisi
+# Fonction demandant à l'utilisateur la classe choisie
+# Retourne un int de 0 à 4 représentant la classe choisie
 def ask_classe(player_number):
-    
-    os.system("cls") # Permet de clear 
-    show_classe() 
-    return int(input(sayToPlayer(player_number,"choose a number:"))) - 1 
+    classIndex = 0
+    while True:
+        os.system("cls") # Permet de clear 
+        show_classe(classIndex)
+        sys.stdout.flush()
+        char = msvcrt.getch()
+        if char in [b"\n",b"\r",b"\r\n",b"\n\r"]:
+            # Entrée
+            break
+        if char == b"\x00" :
+            # Flèches
+            arrow = msvcrt.getch()
+            if arrow == b"P": # Up
+                classIndex = min(3,classIndex+1)
+            if arrow == b"H": # Down
+                classIndex = max(0,classIndex-1)
+    return int(classIndex)
 
 def classes_selection():
     choose_class = []
@@ -91,12 +107,28 @@ def spaceBetween(other_string, size=os.get_terminal_size().columns) -> str:
 def center(string, size=os.get_terminal_size().columns) -> str:
     return int(((size / 2) - (len(string) / 2))/8)*"\t" + string
 
+def chooseFirstPlayer() -> int:
+    for i in range(9):
+        os.system("cls")
+        print(red(center("╭───────────────────────────╮")))
+        dots = "."*(i%3+1)
+        print(red(center(f"│ Choosing random number{dots:<3} │")))
+        print(red(center("╰───────────────────────────╯ ")))
+        sleep(0.3)
+    return randint(0,1)
+
+def sayWhoIsFirst(number:int):
+    os.system("cls")
+    print(center("╭───────────────────────────────────╮"))
+    print(center(f"│ Le premier joueur est le numéro {number} │"))
+    print(center("╰───────────────────────────────────╯"))
+
 def interface(player_stat, actual_player, message:str):
     os.system("cls")
     
-    print(green("╭──────────╮ "+ spaceBetween(34) + " ╭──────────────────╮"))
-    print(green("│ "+"Joueur "+ str(actual_player + 1)+ " │ "+ spaceBetween(34)+ " │ " +"Mana: "+ f"{player_stat['mana']:<2}"+ " HP: "+ f"{player_stat['hp']:<3}" + " │" ))
-    print(green("╰──────────╯ "+ spaceBetween(34) + " ╰──────────────────╯"))
+    print(red("╭──────────╮ "+ spaceBetween(34) + " ╭──────────────────╮"))
+    print(red("│ "+"Joueur "+ str(actual_player + 1)+ " │ "+ spaceBetween(34)+ " │ " +"Mana: "+ f"{player_stat['mana']:<2}"+ " HP: "+ f"{player_stat['hp']:<3}" + " │" ))
+    print(red("╰──────────╯ "+ spaceBetween(34) + " ╰──────────────────╯"))
     print(2*"\n")
 
     split_message = message.split("\n")
@@ -117,31 +149,49 @@ def interface(player_stat, actual_player, message:str):
 
 
 # Fonction gérant la boucle de jeu et le changement de joueur pour chaque tour
-def game_loop(players_stats):
-    actual_player = 0
+def game_loop(players_stats:list):
+    actual_player = chooseFirstPlayer()
+    sayWhoIsFirst(actual_player+1)
+    sleep(1)
     while True:
         turn(actual_player, players_stats)
         actual_player ^= 1
+        players_stats.reverse()
 
 def turn(actual_player, players_stats):
 
     roll = mana_roll()
-    players_stats[actual_player]["mana"] = min(players_stats[actual_player]["topMana"],players_stats[actual_player]["mana"] + roll[0])
-    interface(players_stats[actual_player], actual_player, roll[1])
+    players_stats[0]["mana"] = min(players_stats[0]["topMana"],players_stats[0]["mana"] + roll[0])
+    interface(players_stats[0], actual_player, roll[1])
     input()
-    interface(players_stats[actual_player], actual_player, display_competence(players_stats[actual_player]["class"]))
-    select_competences(players_stats[actual_player]["class"])
+    competence = None
+    while competence == None:
+        interface(players_stats[0], actual_player, display_competence(players_stats[0]["class"]))
+        competence = select_competences()
+        if competence == 5:
+            # Pour ne pas rentrer dans une erreur avec une cinquième compétence, qui n'existe pas
+            pass
+        elif competences(players_stats[0]["class"])[competence][1] > players_stats[0]["mana"]:
+            interface(players_stats[0],actual_player,"You do not have enough mana!")
+        else:
+            players_stats[0]["mana"] -= competences(players_stats[0]["class"])[competence][1]
+            attackRoll(competences(players_stats[0]["class"])[competence])
 
-def select_competences(player_class):
-    selected = input("Choisisez une compétence (numéro): ")
-    print(selected)
-    input()
+
+def select_competences():
+    numberChoosen = input("Choisisez une compétence (numéro): ")
+    if numberChoosen not in ["1","2","3","4","5"]:
+        numberChoosen = None
+    else:
+        int(numberChoosen) - 1
+    return numberChoosen
 
 def display_competence(player_class):
     comp = competences(player_class)
     display_text = "Competences:"
     for i in range(len(comp)):
         display_text += f"\n{i + 1}: {comp[i][0]}, {comp[i][3]} ;  {comp[i][1]} mana"
+    display_text += f"\n5: Keep the mana"
     return display_text
 
 
@@ -155,7 +205,6 @@ def mana_roll():
 
 def play():
     players_stats = start_stat()
-    print(players_stats)
     game_loop(players_stats)
 
 play()
