@@ -1,7 +1,6 @@
 from random import randint
 from classes import *
 #Reading input from console (arrows)
-import msvcrt
 from math import floor
 from time import sleep
 import os,msvcrt,sys
@@ -92,7 +91,8 @@ def attackRoll(attack:tuple[str,int,dict,str], attackerStats:dict, defenderStats
             else:
                 attackerStats[i] += amountDiced(roll, attack[2][i])
 
-    return attackerStats, defenderStats
+    return [attackerStats, defenderStats]
+
 
 # ----------------------------- Utilitaire ----------------------------------
 
@@ -154,7 +154,7 @@ def game_loop(players_stats:list):
     sayWhoIsFirst(actual_player+1)
     sleep(1)
     while True:
-        turn(actual_player, players_stats)
+        players_stats = turn(actual_player, players_stats)
         actual_player ^= 1
         players_stats.reverse()
 
@@ -169,25 +169,32 @@ def turn(actual_player, players_stats):
 
         interface(players_stats[0], actual_player, display_competence(players_stats[0]["class"]))
         competence = select_competences(players_stats[0]["class"])   
-        if competence == 5:
+        if competence == None:
+            h= 0
+        elif competence == 5:
             # Pour ne pas rentrer dans une erreur avec une cinquième compétence, qui n'existe pas
-            pass
+            return players_stats
         elif competence[1] > players_stats[0]["mana"]:
             interface(players_stats[0],actual_player,"You do not have enough mana!")
-            input()
+            competence = None
+            sleep(2)
         else:
             players_stats[0]["mana"] -= competence[1]
-            print(attackRoll(competence, players_stats[0], players_stats[1]))
-            input()
+            return attackRoll(competence, players_stats[0], players_stats[1])
+            
 
 
 def select_competences(playerclass):
     numberChoosen = input("Choisisez une compétence (numéro): ")
     if numberChoosen not in ["1","2","3","4","5"]:
-        numberChoosen = None
+        return None
+    
     else:
         numberChoosen = int(numberChoosen) - 1
-        
+    
+    if numberChoosen == 4:
+        return 5
+
     return competences(playerclass)[numberChoosen]
 
 def display_competence(player_class):
