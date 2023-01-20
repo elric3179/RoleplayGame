@@ -11,6 +11,7 @@ green       = lambda string: "\033[1;32m" + string + "\033[0;00m"
 darkgreen       = lambda string: "\033[0;32m" + string + "\033[0;00m"
 # ----------------------- Mapping des pourcentages ------------------------
 
+# Permet de déterminer un pourcentage d'éfficacité de l'attaque en fonction d'un résulat d'un dé
 diceMappings = {
     1 : 0.65,
     2 : 0.8,
@@ -41,6 +42,7 @@ def roll_dice(dice_number) -> list:
 def dice():
     return randint(1, 6)
 
+# Calculer le valeur associé a une compétence une fois un dé lancer
 def amountDiced(diceNum:int,attackAmount:int) -> int:
     return floor(attackAmount * diceMappings[diceNum])
 
@@ -62,15 +64,18 @@ def ask_classe(player_number):
                 classIndex = max(0,classIndex-1)
             case b"\n" | b"\r" | b"\r\n" | b"\n\r":
                 break
-   
     return int(classIndex)
 
+# Gère la sélection de classe pour les 2 joueurs
+# Retourne une liste de deux nombre dans l'intervalle [0; 3] représentant la classe choisi
 def classes_selection():
     choose_class = []
     for i in range(2):
         choose_class.append(ask_classe(i + 1))
     return choose_class
 
+# Lancement du système de stat et donc du système de classe
+# Retourne une liste des stats de chaque joueur
 def start_stat() -> list:
     choosen_class = classes_selection()
     players_stats_start = []
@@ -80,6 +85,8 @@ def start_stat() -> list:
 
 # ----------------------------- Competence ----------------------------------
 
+# Fonction appellé a l'utilisation d'une compétence demande les statistiques des 2 joueurs et les modifie en fonction de la compétence et d'un lancer de dé
+# Retourne les statistique des 2 joueurs
 def attackRoll(attack:tuple[str,int,dict,str], attackerStats:dict, defenderStats:dict):
     roll = dice()
     for i in attack[2].keys():
@@ -96,55 +103,72 @@ def attackRoll(attack:tuple[str,int,dict,str], attackerStats:dict, defenderStats
 
 # ----------------------------- Utilitaire ----------------------------------
 
-# Permet de creer un message (texte en argument) a destination d'un joueur donner en argument
-# Retourne un string construit
-def sayToPlayer(num,text) -> str:
-    return f"Player {num}, {text} "
+# Créer un string placé sur la bordure droite de la fênetre de commande en fonction d'un texte
+# Retourne un texte situé sur la limite droite de la fênetre
+def border(text:str) -> str:
+    return (os.get_terminal_size().columns - len(text)) * " " + text
 
-def spaceBetween(other_string, size=os.get_terminal_size().columns) -> str:
-    return int(((size  - other_string)/8))*"\t"
+# Crée un string placé sur le centre de la fênetre de commande en fonction d'un texte
+# Retourne un texte situé sur le centre de la fênetre
+def center(string: str) -> str:
+    return int(((os.get_terminal_size().columns / 2) - (len(string) / 2)))*" " + string
 
-def center(string, size=os.get_terminal_size().columns) -> str:
-    return int(((size / 2) - (len(string) / 2))/8)*"\t" + string
+# Crée des chaines de caractère pour l'affichage d'un joueur en fonction de ces statistiques
+# Retourne une liste de string pret a l'emploi
+def player_menu(player_stat, player_number):
+    text_result = []
+
+    text_result.append("╭" +20*"─" + "╮")
+    text_result.append(("│ " + "Joueur " + str(player_number + 1) + 11*" " +  "│" ))
+    text_result.append(("│ " + "Classe: " + f"{player_stat['class']:<11}" + "│"))
+    text_result.append(("│ " +"Mana: "+ f"{player_stat['mana']:<2}"+ " HP: "+ f"{player_stat['hp']:<3}"  + 3*" "+ "│"))
+    text_result.append("╰" +20*"─" + "╯")
+    return text_result
+
 
 def chooseFirstPlayer() -> int:
     for i in range(9):
         os.system("cls")
-        print(red(center("╭───────────────────────────╮")))
         dots = "."*(i%3+1)
-        print(red(center(f"│ Choosing random number{dots:<3} │")))
-        print(red(center("╰───────────────────────────╯ ")))
+        displayCustomMessage(f"Choosing random number{dots:<3}")
         sleep(0.3)
     return randint(0,1)
 
 def sayWhoIsFirst(number:int):
     os.system("cls")
-    print(center("╭───────────────────────────────────╮"))
-    print(center(f"│ Le premier joueur est le numéro {number} │"))
-    print(center("╰───────────────────────────────────╯"))
+    displayCustomMessage(f"Le premier joueur est le numéro {number}")
 
-def interface(player_stat, actual_player, message:str):
-    os.system("cls")
-    
-    print(red("╭──────────╮ "+ spaceBetween(34) + " ╭──────────────────╮"))
-    print(red("│ "+"Joueur "+ str(actual_player + 1)+ " │ "+ spaceBetween(34)+ " │ " +"Mana: "+ f"{player_stat['mana']:<2}"+ " HP: "+ f"{player_stat['hp']:<3}" + " │" ))
-    print(red("╰──────────╯ "+ spaceBetween(34) + " ╰──────────────────╯"))
-    print(2*"\n")
-
+# Permet l'affichage d'un message custom dans le format de l'affichage
+# Ne retourne rien
+def displayCustomMessage(message):
+    #Display the custom message
     split_message = message.split("\n")
     max_len = len(max(split_message, key=len))
-    
     
     print(center(("╭" + (max_len)*"─" + "╮")))
 
     for i in range(len(split_message)):
-        
         text = "".join(("│", split_message[i], (max_len - len(split_message[i]))*" " ,"│"))
         print(center(text))
 
-    
     print(center("╰" + (max_len)*"─" + "╯"))
 
+# Gére l'affichage d'une interface montrant toute les informations principales au joueurs
+# Ne retourne rien
+def interface(players_stat, actual_player, message:str):
+    os.system("cls")
+
+    other_player = actual_player ^1
+    for i in player_menu(players_stat[other_player], other_player):
+        print(red(border(i)))
+
+    print(5*"\n")
+
+    for i in player_menu(players_stat[actual_player], actual_player):
+        print(green(i))
+
+    print(2*"\n")
+    displayCustomMessage(message)
 # --------------------------------- Autre -----------------------------------
 
 
@@ -162,12 +186,12 @@ def turn(actual_player, players_stats):
 
     roll = mana_roll()
     players_stats[0]["mana"] = min(players_stats[0]["topMana"],players_stats[0]["mana"] + roll[0])
-    interface(players_stats[0], actual_player, roll[1])
+    interface(players_stats, actual_player, roll[1])
     input()
     competence = None
     while competence == None:
 
-        interface(players_stats[0], actual_player, display_competence(players_stats[0]["class"]))
+        interface(players_stats, actual_player, display_competence(players_stats[0]["class"]))
         competence = select_competences(players_stats[0]["class"])   
         if competence == None:
             h= 0
@@ -175,7 +199,7 @@ def turn(actual_player, players_stats):
             # Pour ne pas rentrer dans une erreur avec une cinquième compétence, qui n'existe pas
             return players_stats
         elif competence[1] > players_stats[0]["mana"]:
-            interface(players_stats[0],actual_player,"You do not have enough mana!")
+            interface(players_stats,actual_player,"You do not have enough mana!")
             competence = None
             sleep(2)
         else:
