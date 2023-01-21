@@ -126,13 +126,17 @@ def player_menu(player_stat, player_number):
     return text_result
 
 
-def chooseFirstPlayer() -> int:
+def chooseFirstPlayer(players_stat: list) -> list:
     for i in range(9):
         os.system("cls")
         dots = "."*(i%3+1)
         displayCustomMessage(f"Choosing random number{dots:<3}")
         sleep(0.3)
-    return randint(0,1)
+    choosen = randint(0,1)
+    if choosen == 1:
+        players_stat.reverse()
+        
+    return [choosen, players_stat]
 
 def sayWhoIsFirst(number:int):
     os.system("cls")
@@ -159,12 +163,12 @@ def interface(players_stat, actual_player, message:str):
     os.system("cls")
 
     other_player = actual_player ^1
-    for i in player_menu(players_stat[other_player], other_player):
+    for i in player_menu(players_stat[1], other_player):
         print(red(border(i)))
 
     print(5*"\n")
 
-    for i in player_menu(players_stat[actual_player], actual_player):
+    for i in player_menu(players_stat[0], actual_player):
         print(green(i))
 
     print(2*"\n")
@@ -174,7 +178,9 @@ def interface(players_stat, actual_player, message:str):
 
 # Fonction gérant la boucle de jeu et le changement de joueur pour chaque tour
 def game_loop(players_stats:list):
-    actual_player = chooseFirstPlayer()
+    choosen = chooseFirstPlayer(players_stats)
+    actual_player  = choosen[0]
+    players_stats = choosen[1]
     sayWhoIsFirst(actual_player+1)
     sleep(1)
     while True:
@@ -187,7 +193,8 @@ def turn(actual_player, players_stats):
     roll = mana_roll()
     players_stats[0]["mana"] = min(players_stats[0]["topMana"],players_stats[0]["mana"] + roll[0])
     interface(players_stats, actual_player, roll[1])
-    input()
+    print()
+    input(players_stats)
     competence = None
     while competence == None:
 
@@ -235,7 +242,7 @@ def mana_roll():
     dice_result = roll_dice(2)
     total = sum(dice_result)
     string_output = f"Lancement de dés de mana... \nVous avez obtenu {dice_result[0]} et {dice_result[1]} pour un total de {total}"
-    return (total, str(string_output))
+    return (total, (string_output))
     
 
 def play():
