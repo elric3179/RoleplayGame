@@ -21,6 +21,9 @@ diceMappings = {
     6 : 1.25
 }
 
+#Permet de déterminer l'éfficacité en fonction de la défense
+defenseCalculator = lambda attack, defense : attack / (1+(defense/100))
+
 # -------------------------- Gestion des stats ----------------------------
 
 attackerStatsList = ["mana","hp","def"]
@@ -91,7 +94,7 @@ def attackRoll(attack:tuple[str,int,dict,str], attackerStats:dict, defenderStats
     roll = dice()
     for i in attack[2].keys():
         if i in defenderStatsList:
-            defenderStats[i[3:]] = max(0,defenderStats[i[3:]]-amountDiced(roll, attack[2][i]))
+            defenderStats[i[3:]] = max(0,defenseCalculator(defenderStats[i[3:]]-amountDiced(roll, attack[2][i]),defenderStats["def"]))
         elif i in attackerStatsList:
             if i == "mana":
                 attackerStats[i] = min(attackerStats["topMana"],attackerStats[i] + amountDiced(roll,attack[2][i]))
