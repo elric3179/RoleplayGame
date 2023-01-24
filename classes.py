@@ -41,7 +41,7 @@ def stats(classe) -> dict:
         case "mage":
             return {"class":classe,"mana":10,"hp":80,"def":10,"topMana":60}
         case "paladin":
-            return {"class":classe,"mana":0,"hp":60,"def":1125,"topMana":80}
+            return {"class":classe,"mana":0,"hp":60,"def":30,"topMana":80}
         case "archer":
             return {"class":classe,"mana": 20, "hp": 75, "def": 15, "topMana": 60}
 

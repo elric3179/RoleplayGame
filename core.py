@@ -269,5 +269,4 @@ def mana_roll():
 def play():
     players_stats = start_stat()
     game_loop(players_stats)
-
 play()
