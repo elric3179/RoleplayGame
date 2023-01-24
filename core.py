@@ -217,7 +217,7 @@ def turn(actual_player, players_stats):
     while competence == None:
         competenceIndex = 0
         os.system("cls")
-        interface(players_stats, actual_player, display_competence(players_stats[0]["class"], competenceIndex))
+        interface(players_stats, actual_player, display_competence(players_stats[0], competenceIndex))
         while True:
             sys.stdout.flush()
             char = msvcrt.getch()
@@ -225,12 +225,12 @@ def turn(actual_player, players_stats):
                 case b"P":
                     competenceIndex = min(4,competenceIndex+1)
                     os.system("cls")
-                    interface(players_stats, actual_player, display_competence(players_stats[0]["class"], competenceIndex))
+                    interface(players_stats, actual_player, display_competence(players_stats[0], competenceIndex))
                     sleep(0.1)
                 case b"H":
                     competenceIndex = max(0,competenceIndex-1)
                     os.system("cls")
-                    interface(players_stats, actual_player, display_competence(players_stats[0]["class"], competenceIndex))
+                    interface(players_stats, actual_player, display_competence(players_stats[0], competenceIndex))
                     sleep(0.1)
                 case b"\n" | b"\r" | b"\r\n" | b"\n\r":
                     break
@@ -240,16 +240,16 @@ def turn(actual_player, players_stats):
         elif competenceIndex == 4:
             # Pour ne pas rentrer dans une erreur avec une cinquième compétence, qui n'existe pas
             return players_stats
-        elif competences(players_stats[0]["class"])[competenceIndex][1] > players_stats[0]["mana"]:
+        elif players_stats[0]["attacks"][competenceIndex][1] > players_stats[0]["mana"]:
             interface(players_stats,actual_player,"You do not have enough mana!")
             competence = None
             sleep(2)
         else:
-            players_stats[0]["mana"] -= competences(players_stats[0]["class"])[competenceIndex][1]
-            return attackRoll(competences(players_stats[0]["class"])[competenceIndex], players_stats[0], players_stats[1],actual_player)
+            players_stats[0]["mana"] -= players_stats[0]["attacks"][competenceIndex][1]
+            return attackRoll(players_stats[0]["attacks"][competenceIndex], players_stats[0], players_stats[1],actual_player)
             
-def display_competence(player_class, competenceIndex):
-    comp = competences(player_class)
+def display_competence(player_stats, competenceIndex):
+    comp = player_stats["attacks"]
     display_text = "Competences:"
     for i in range(len(comp)):
         if i == competenceIndex:
