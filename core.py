@@ -1,7 +1,7 @@
 from random import randint
 from classes import *
 #Reading input from console (arrows)
-from math import floor
+from math import ceil
 from time import sleep
 import os,msvcrt,sys
 
@@ -47,7 +47,7 @@ def dice():
 
 # Calculer le valeur associé a une compétence une fois un dé lancer
 def amountDiced(diceNum:int,attackAmount:int) -> int:
-    return floor(attackAmount * diceMappings[diceNum])
+    return ceil(attackAmount * diceMappings[diceNum])
 
 # --------------------------- Gestion des classes ---------------------------
 
@@ -90,14 +90,14 @@ def start_stat() -> list:
 
 # Fonction appellé a l'utilisation d'une compétence demande les statistiques des 2 joueurs et les modifie en fonction de la compétence et d'un lancer de dé
 # Retourne les statistique des 2 joueurs
-def attackRoll(attack:tuple[str,int,dict,str], attackerStats:dict, defenderStats:dict):
-    roll = dice()
+def attackRoll(attack:tuple[str,int,dict,str], attackerStats:dict, defenderStats:dict, actual_player):
+    roll = rollAndDisplayDice([attackerStats,defenderStats],actual_player)
     for i in attack[2].keys():
         if i in defenderStatsList:
-            defenderStats[i[3:]] = max(0,defenseCalculator(defenderStats[i[3:]]-amountDiced(roll, attack[2][i]),defenderStats["def"]))
+            defenderStats[i[3:]] = max(0,defenderStats[i[3:]]-ceil(defenseCalculator(amountDiced(roll, attack[2][i]),defenderStats["def"])))
         elif i in attackerStatsList:
             if i == "mana":
-                attackerStats[i] = min(attackerStats["topMana"],attackerStats[i] + amountDiced(roll,attack[2][i]))
+                attackerStats[i] = min(attackerStats["topMana"],attackerStats[i] + attack[2][i])
             else:
                 attackerStats[i] += amountDiced(roll, attack[2][i])
 
@@ -105,6 +105,12 @@ def attackRoll(attack:tuple[str,int,dict,str], attackerStats:dict, defenderStats
 
 
 # ----------------------------- Utilitaire ----------------------------------
+
+#Prends deux arguments et place l'espace nécéssaire pour que un élément soit à gauche l'autre soit à droite
+def spaceBetween(leftText:str, rightText:str) -> str:
+    columnsConst = os.get_terminal_size().columns
+    columnsConst -= len(leftText+rightText)
+    return columnsConst
 
 # Créer un string placé sur la bordure droite de la fênetre de commande en fonction d'un texte
 # Retourne un texte situé sur la limite droite de la fênetre
@@ -123,17 +129,24 @@ def player_menu(player_stat, player_number):
 
     text_result.append("╭" +20*"─" + "╮")
     text_result.append(("│ " + "Joueur " + str(player_number + 1) + 11*" " +  "│" ))
-    text_result.append(("│ " + "Classe: " + f"{player_stat['class']:<11}" + "│"))
+    text_result.append(("│ " + "Classe: " + f"{player_stat['class'].title():<11}" + "│"))
     text_result.append(("│ " +"Mana: "+ f"{player_stat['mana']:<2}"+ " HP: "+ f"{player_stat['hp']:<3}"  + 3*" "+ "│"))
     text_result.append("╰" +20*"─" + "╯")
     return text_result
 
+#Rolling the dice for attack roll
+def rollAndDisplayDice(player_stats, actual_player) -> int:
+    sleep(2)
+    rolledAmount = dice()
+    interface(player_stats,actual_player,f"You rolled a {rolledAmount}\nYour move is now {int(diceMappings[rolledAmount]*100)-100}% {'worse' if int(diceMappings[rolledAmount]*100)-100 < 0 else 'better'}")
+    sleep(2)
+    return rolledAmount
 
 def chooseFirstPlayer(players_stat: list) -> list:
     for i in range(9):
         os.system("cls")
         dots = "."*(i%3+1)
-        displayCustomMessage(f"Choosing random number{dots:<3}")
+        displayCustomMessage(f"Choosing first player{dots:<3}")
         sleep(0.3)
     choosen = randint(0,1)
     if choosen == 1:
@@ -166,13 +179,17 @@ def interface(players_stat, actual_player, message:str):
     os.system("cls")
 
     other_player = actual_player ^1
-    for i in player_menu(players_stat[1], other_player):
-        print(red(border(i)))
-
-    print(5*"\n")
-
+    actual_message = []
     for i in player_menu(players_stat[0], actual_player):
-        print(green(i))
+        actual_message.append(i)
+
+    indexVar = 0
+    for i in player_menu(players_stat[1], other_player):
+        actual_message[indexVar] += spaceBetween(actual_message[indexVar],i)*" " + i
+        indexVar += 1
+
+    for i in actual_message:
+        print(green(i[:28]) + red(i[28:]))
 
     print(2*"\n")
     displayCustomMessage(message)
@@ -185,58 +202,59 @@ def game_loop(players_stats:list):
     actual_player  = choosen[0]
     players_stats = choosen[1]
     sayWhoIsFirst(actual_player+1)
-    sleep(1)
+    sleep(2)
     while True:
         players_stats = turn(actual_player, players_stats)
         actual_player ^= 1
         players_stats.reverse()
 
 def turn(actual_player, players_stats):
-
     roll = mana_roll()
     players_stats[0]["mana"] = min(players_stats[0]["topMana"],players_stats[0]["mana"] + roll[0])
     interface(players_stats, actual_player, roll[1])
-    print()
-    input(players_stats)
+    sleep(2)
     competence = None
     while competence == None:
-
-        interface(players_stats, actual_player, display_competence(players_stats[0]["class"]))
-        competence = select_competences(players_stats[0]["class"])   
-        if competence == None:
-            h= 0
-        elif competence == 5:
+        competenceIndex = 0
+        os.system("cls")
+        interface(players_stats, actual_player, display_competence(players_stats[0]["class"], competenceIndex))
+        while True:
+            sys.stdout.flush()
+            char = msvcrt.getch()
+            match char:
+                case b"P":
+                    competenceIndex = min(4,competenceIndex+1)
+                    os.system("cls")
+                    interface(players_stats, actual_player, display_competence(players_stats[0]["class"], competenceIndex))
+                case b"H":
+                    competenceIndex = max(0,competenceIndex-1)
+                    os.system("cls")
+                    interface(players_stats, actual_player, display_competence(players_stats[0]["class"], competenceIndex))
+                case b"\n" | b"\r" | b"\r\n" | b"\n\r":
+                    break
+            sleep(0.2)
+        if competenceIndex == None:
+            pass
+        elif competenceIndex == 4:
             # Pour ne pas rentrer dans une erreur avec une cinquième compétence, qui n'existe pas
             return players_stats
-        elif competence[1] > players_stats[0]["mana"]:
+        elif competences(players_stats[0]["class"])[competenceIndex][1] > players_stats[0]["mana"]:
             interface(players_stats,actual_player,"You do not have enough mana!")
             competence = None
             sleep(2)
         else:
-            players_stats[0]["mana"] -= competence[1]
-            return attackRoll(competence, players_stats[0], players_stats[1])
+            players_stats[0]["mana"] -= competences(players_stats[0]["class"])[competenceIndex][1]
+            return attackRoll(competences(players_stats[0]["class"])[competenceIndex], players_stats[0], players_stats[1],actual_player)
             
-
-
-def select_competences(playerclass):
-    numberChoosen = input("Choisisez une compétence (numéro): ")
-    if numberChoosen not in ["1","2","3","4","5"]:
-        return None
-    
-    else:
-        numberChoosen = int(numberChoosen) - 1
-    
-    if numberChoosen == 4:
-        return 5
-
-    return competences(playerclass)[numberChoosen]
-
-def display_competence(player_class):
+def display_competence(player_class, competenceIndex):
     comp = competences(player_class)
     display_text = "Competences:"
     for i in range(len(comp)):
-        display_text += f"\n{i + 1}: {comp[i][0]}, {comp[i][3]} ;  {comp[i][1]} mana"
-    display_text += f"\n5: Keep the mana"
+        if i == competenceIndex:
+            display_text += f"\n>: {comp[i][0]}, {comp[i][3]} ;  {comp[i][1]} mana"
+        else:
+            display_text += f"\n█: {comp[i][0]}, {comp[i][3]} ;  {comp[i][1]} mana"
+    display_text += f"\n{'>' if competenceIndex == 4 else '█'}: Keep the mana"
     return display_text
 
 
