@@ -33,7 +33,7 @@ defenderStatsList = ["atthp","attmana"]
 
 # Permet de lancer un nombre donné de dés
 # Retourne une liste contenant les résultats des lancer
-def roll_dice(dice_number) -> list:
+def roll_dice(dice_number: int) -> list:
     result = []
     for i in range(dice_number):
         result.append(dice())
@@ -53,28 +53,28 @@ def amountDiced(diceNum:int,attackAmount:int) -> int:
 
 # Fonction demandant à l'utilisateur la classe choisie
 # Retourne un int de 0 à 4 représentant la classe choisie
-def ask_classe(player_number):
+def ask_classe():
+    sys.stdout.flush()
     classIndex = 0
     while True:
-        os.system("cls") # Permet de clear 
+        os.system("cls")# Permet de clear 
         show_classe(classIndex)
-        sys.stdout.flush()
-        char = msvcrt.getch()
-        match char:
-            case b"P":
-                classIndex = min(3,classIndex+1)
-            case b"H":
-                classIndex = max(0,classIndex-1)
-            case b"\n" | b"\r" | b"\r\n" | b"\n\r":
-                break
+        choix = scroll_selection(classIndex, 3)
+        classIndex = choix[0]
+        if choix[1] == True:
+            break
+        
+        
     return int(classIndex)
+
+
 
 # Gère la sélection de classe pour les 2 joueurs
 # Retourne une liste de deux nombre dans l'intervalle [0; 3] représentant la classe choisi
 def classes_selection():
     choose_class = []
     for i in range(2):
-        choose_class.append(ask_classe(i + 1))
+        choose_class.append(ask_classe())
     return choose_class
 
 # Lancement du système de stat et donc du système de classe
@@ -193,6 +193,19 @@ def interface(players_stat, actual_player, message:str):
 
     print(2*"\n")
     displayCustomMessage(message)
+
+
+def scroll_selection(index, maxValeur):
+    char = msvcrt.getch()
+    match char:
+        case b"P":
+            index = min(maxValeur,index+1)
+        case b"H":
+            index = max(0,index-1)
+        case b"\n" | b"\r" | b"\r\n" | b"\n\r":
+            return index, True
+    return index, False
+
 # --------------------------------- Autre -----------------------------------
 
 
@@ -214,26 +227,20 @@ def turn(actual_player, players_stats):
     interface(players_stats, actual_player, roll[1])
     sleep(2)
     competence = None
+    
     while competence == None:
         competenceIndex = 0
         os.system("cls")
+        while msvcrt.kbhit():
+            msvcrt.getch()
         interface(players_stats, actual_player, display_competence(players_stats[0]["class"], competenceIndex))
         while True:
-            sys.stdout.flush()
-            char = msvcrt.getch()
-            match char:
-                case b"P":
-                    competenceIndex = min(4,competenceIndex+1)
-                    os.system("cls")
-                    interface(players_stats, actual_player, display_competence(players_stats[0]["class"], competenceIndex))
-                    sleep(0.1)
-                case b"H":
-                    competenceIndex = max(0,competenceIndex-1)
-                    os.system("cls")
-                    interface(players_stats, actual_player, display_competence(players_stats[0]["class"], competenceIndex))
-                    sleep(0.1)
-                case b"\n" | b"\r" | b"\r\n" | b"\n\r":
-                    break
+
+            interface(players_stats, actual_player, display_competence(players_stats[0]["class"], competenceIndex))
+            choix = scroll_selection(competenceIndex, 4)
+            competenceIndex = choix[0]
+            if choix[1] == True:
+                break
             
         if competenceIndex == None:
             pass
