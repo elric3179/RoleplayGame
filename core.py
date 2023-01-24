@@ -53,7 +53,7 @@ def amountDiced(diceNum:int,attackAmount:int) -> int:
 
 # Fonction demandant à l'utilisateur la classe choisie
 # Retourne un int de 0 à 4 représentant la classe choisie
-def ask_classe(player_number):
+def ask_classe():
     classIndex = 0
     while True:
         os.system("cls") # Permet de clear 
@@ -90,7 +90,7 @@ def start_stat() -> list:
 
 # Fonction appellé a l'utilisation d'une compétence demande les statistiques des 2 joueurs et les modifie en fonction de la compétence et d'un lancer de dé
 # Retourne les statistique des 2 joueurs
-def attackRoll(attack:tuple[str,int,dict,str], attackerStats:dict, defenderStats:dict, actual_player):
+def skillRoll(attack:tuple[str,int,dict,str], attackerStats:dict, defenderStats:dict, actual_player):
     roll = rollAndDisplayDice([attackerStats,defenderStats],actual_player)
     for i in attack[2].keys():
         if i in defenderStatsList:
@@ -108,8 +108,7 @@ def attackRoll(attack:tuple[str,int,dict,str], attackerStats:dict, defenderStats
 
 #Prends deux arguments et place l'espace nécéssaire pour que un élément soit à gauche l'autre soit à droite
 def spaceBetween(leftText:str, rightText:str) -> str:
-    columnsConst = os.get_terminal_size().columns
-    columnsConst -= len(leftText+rightText)
+    columnsConst = os.get_terminal_size().columns - len(leftText+rightText)
     return columnsConst
 
 # Créer un string placé sur la bordure droite de la fênetre de commande en fonction d'un texte
@@ -138,7 +137,7 @@ def player_menu(player_stat, player_number):
 def rollAndDisplayDice(player_stats, actual_player) -> int:
     sleep(2)
     rolledAmount = dice()
-    interface(player_stats,actual_player,f"You rolled a {rolledAmount}\nYour move is now {int(diceMappings[rolledAmount]*100)-100}% {'worse' if int(diceMappings[rolledAmount]*100)-100 < 0 else 'better'}")
+    interface(player_stats,actual_player,f"You rolled a {rolledAmount}\nYour move is now {abs(int(diceMappings[rolledAmount]*100)-100)}% {'worse' if int(diceMappings[rolledAmount]*100)-100 < 0 else 'better'}")
     sleep(2)
     return rolledAmount
 
@@ -246,7 +245,7 @@ def turn(actual_player, players_stats):
             sleep(2)
         else:
             players_stats[0]["mana"] -= players_stats[0]["attacks"][competenceIndex][1]
-            return attackRoll(players_stats[0]["attacks"][competenceIndex], players_stats[0], players_stats[1],actual_player)
+            return skillRoll(players_stats[0]["attacks"][competenceIndex], players_stats[0], players_stats[1],actual_player)
             
 def display_competence(player_stats, competenceIndex):
     comp = player_stats["attacks"]
