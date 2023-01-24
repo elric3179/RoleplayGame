@@ -37,13 +37,13 @@ def competences(classe) -> tuple:
 def stats(classe) -> dict:
     match classe:
         case "berserker":
-            return {"class":classe,"mana":0,"hp":100,"def":20,"topMana":40}
+            return {"class":classe,"mana":0,"hp":100,"def":20,"topMana":40,"attacks":competences(classe)}
         case "mage":
-            return {"class":classe,"mana":10,"hp":80,"def":10,"topMana":60}
+            return {"class":classe,"mana":10,"hp":80,"def":10,"topMana":60,"attacks":competences(classe)}
         case "paladin":
-            return {"class":classe,"mana":0,"hp":60,"def":30,"topMana":80}
+            return {"class":classe,"mana":0,"hp":60,"def":30,"topMana":80,"attacks":competences(classe)}
         case "archer":
-            return {"class":classe,"mana": 20, "hp": 75, "def": 15, "topMana": 60}
+            return {"class":classe,"mana":20,"hp":75,"def":15,"topMana":60,"attacks":competences(classe)}
 
 
 def show_classe(index:int):
