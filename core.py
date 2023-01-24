@@ -226,13 +226,15 @@ def turn(actual_player, players_stats):
                     competenceIndex = min(4,competenceIndex+1)
                     os.system("cls")
                     interface(players_stats, actual_player, display_competence(players_stats[0]["class"], competenceIndex))
+                    sleep(0.1)
                 case b"H":
                     competenceIndex = max(0,competenceIndex-1)
                     os.system("cls")
                     interface(players_stats, actual_player, display_competence(players_stats[0]["class"], competenceIndex))
+                    sleep(0.1)
                 case b"\n" | b"\r" | b"\r\n" | b"\n\r":
                     break
-            sleep(0.2)
+            
         if competenceIndex == None:
             pass
         elif competenceIndex == 4:
@@ -269,4 +271,6 @@ def mana_roll():
 def play():
     players_stats = start_stat()
     game_loop(players_stats)
+
+
 play()
