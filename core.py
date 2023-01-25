@@ -232,10 +232,10 @@ def turn(actual_player, players_stats):
         os.system("cls")
         while msvcrt.kbhit():
             msvcrt.getch()
-        interface(players_stats, actual_player, display_competence(players_stats[0]["class"], competenceIndex))
+        interface(players_stats, actual_player, display_competence(players_stats[0], competenceIndex))
         while True:
 
-            interface(players_stats, actual_player, display_competence(players_stats[0]["class"], competenceIndex))
+            interface(players_stats, actual_player, display_competence(players_stats[0], competenceIndex))
             choix = scroll_selection(competenceIndex, 4)
             competenceIndex = choix[0]
             if choix[1] == True:
