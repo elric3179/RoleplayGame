@@ -34,52 +34,72 @@ defenderStatsList = ["atthp","attmana"]
 # Permet de lancer un nombre donné de dés
 # Retourne une liste contenant les résultats des lancer
 def roll_dice(dice_number: int) -> list:
+    """Lance un certain nombre de dés
+
+    :rtype: list
+    :returns: Liste de résultat de dé
+    """
     result = []
     for i in range(dice_number):
         result.append(dice())
     return result
 
 
-# Fonction de lancemment de dés
-# Retourne entre 1 et 6
 def dice():
+    """Lance un dé de 6
+    """
     return randint(1, 6)
 
-# Calculer le valeur associé a une compétence une fois un dé lancer
+
 def amountDiced(diceNum:int,attackAmount:int) -> int:
+    """Calcule la valeur d'une attaque en fonction d'un lancer de dé
+
+    :param diceNum: Valeur du dé lancé
+    :param attackAmount: Valeur de base de la compétence 
+    """
     return ceil(attackAmount * diceMappings[diceNum])
 
 # --------------------------- Gestion des classes ---------------------------
 
-# Fonction demandant à l'utilisateur la classe choisie
-# Retourne un int de 0 à 4 représentant la classe choisie
+
 def ask_classe():
+    """Gére le choix de classe d'un utilisateur
+
+    :rtype: int
+    :returns: Entier de 0 à 3 représentant une classe
+    """
     sys.stdout.flush()
-    classIndex = 0
+    classIndex = 0 # Placement du curseur actuelle
     while True:
-        os.system("cls")# Permet de clear 
+        os.system("cls"), # Permet de clear 
         show_classe(classIndex)
         choix = scroll_selection(classIndex, 3)
         classIndex = choix[0]
         if choix[1] == True:
             break
         
-        
     return int(classIndex)
 
 
 
-# Gère la sélection de classe pour les 2 joueurs
-# Retourne une liste de deux nombre dans l'intervalle [0; 3] représentant la classe choisi
 def classes_selection():
+    """Gère la sélection des classes pour les deux joueurs
+
+    :rtype: list
+    :returns: Liste de deux valeurs de 0 à 3
+    """
     choose_class = []
     for i in range(2):
         choose_class.append(ask_classe())
     return choose_class
 
-# Lancement du système de stat et donc du système de classe
-# Retourne une liste des stats de chaque joueur
+
 def start_stat() -> list:
+    """Crée les statistique de base des 2 joueurs en fonction de leur choix de classe
+
+    :rtype: list
+    :returns: Liste des statistiques (sous forme de dictionnaire)
+    """
     choosen_class = classes_selection()
     players_stats_start = []
     for i in range(len(choosen_class)):
@@ -108,22 +128,31 @@ def skillRoll(attack:tuple[str,int,dict,str], attackerStats:dict, defenderStats:
 
 #Prends deux arguments et place l'espace nécéssaire pour que un élément soit à gauche l'autre soit à droite
 def spaceBetween(leftText:str, rightText:str) -> str:
+    """Crée un texte au dimension de la fenetre en fonction de deux textes
+
+    :rtype: str
+    """
     columnsConst = os.get_terminal_size().columns - len(leftText+rightText)
     return columnsConst
 
-# Créer un string placé sur la bordure droite de la fênetre de commande en fonction d'un texte
-# Retourne un texte situé sur la limite droite de la fênetre
-def border(text:str) -> str:
-    return (os.get_terminal_size().columns - len(text)) * " " + text
 
 # Crée un string placé sur le centre de la fênetre de commande en fonction d'un texte
 # Retourne un texte situé sur le centre de la fênetre
 def center(string: str) -> str:
+    """Centre un texte sur le centre de la fenetre
+
+    :rtype: str
+    :returns: Texte centré
+    """
     return int(((os.get_terminal_size().columns / 2) - (len(string) / 2)))*" " + string
 
 # Crée des chaines de caractère pour l'affichage d'un joueur en fonction de ces statistiques
 # Retourne une liste de string pret a l'emploi
-def player_menu(player_stat, player_number):
+def player_menu(player_stat:dict, player_number:int) -> str:
+    """Crée un texte de présentation des statistiques des personnages
+
+    :rtype: str
+    """
     text_result = []
 
     text_result.append("╭" +20*"─" + "╮")
@@ -135,7 +164,8 @@ def player_menu(player_stat, player_number):
 
 #Rolling the dice for attack roll
 def rollAndDisplayDice(player_stats, actual_player) -> int:
-    sleep(2)
+    """Crée un texte d'affichage
+    """
     rolledAmount = dice()
     interface(player_stats,actual_player,f"You rolled a {rolledAmount}\nYour move is now {abs(int(diceMappings[rolledAmount]*100)-100)}% {'worse' if int(diceMappings[rolledAmount]*100)-100 < 0 else 'better'}")
     sleep(2)
