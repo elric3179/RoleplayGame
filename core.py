@@ -253,15 +253,21 @@ def turn(actual_player, players_stats):
         else:
             players_stats[0]["mana"] -= players_stats[0]["attacks"][competenceIndex][1]
             return skillRoll(players_stats[0]["attacks"][competenceIndex], players_stats[0], players_stats[1],actual_player)
-            
+
+# Ajout d'une dynamique avec les attaques
+def convertValueInString(string:str, competence:dict) -> str:
+    for i in range(len(competence[2].keys())):
+        string = string.replace(f"value{i}", str(competence[2][list(competence[2].keys())[i]]))
+    return string
+
 def display_competence(player_stats, competenceIndex):
     comp = player_stats["attacks"]
     display_text = "Competences:"
     for i in range(len(comp)):
         if i == competenceIndex:
-            display_text += f"\n>: {comp[i][0]}, {comp[i][3]} ;  {comp[i][1]} mana"
+            display_text += f"\n>: {comp[i][0]}, {convertValueInString(comp[i][3], comp[i])} ;  {comp[i][1]} mana"
         else:
-            display_text += f"\n█: {comp[i][0]}, {comp[i][3]} ;  {comp[i][1]} mana"
+            display_text += f"\n█: {comp[i][0]}, {convertValueInString(comp[i][3], comp[i])} ;  {comp[i][1]} mana"
     display_text += f"\n{'>' if competenceIndex == 4 else '█'}: Keep the mana"
     return display_text
 
@@ -279,4 +285,32 @@ def play():
     game_loop(players_stats)
 
 
-play()
+#play()
+
+def efficacite(dice_number):
+    index = 0
+    
+    rolled_dice = roll_dice(dice_number)
+    while True:
+        result = ""
+        for i in range(len(rolled_dice)):
+            if index == i:
+                result += "»" + str(rolled_dice[i])
+            else:
+                result += " " + str(rolled_dice[i])
+        print(result)
+        #interface(players_stats, actual_player, )
+        
+    
+def selection(index, max_amount):
+    char = msvcrt.getch()
+    match char:
+        case b"P":
+            index = min(max_amount,index+1)
+        case b"H ":
+            index = max(0,index-1)
+        case b"\n" | b"\r" | b"\r\n" | b"\n\r":
+            return index
+
+
+efficacite(5)
