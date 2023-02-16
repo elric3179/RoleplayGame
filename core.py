@@ -31,13 +31,12 @@ defenderStatsList = ["atthp","attmana"]
 
 # --------------------------- Lancement de dés -----------------------------
 
-# Permet de lancer un nombre donné de dés
-# Retourne une liste contenant les résultats des lancer
 def roll_dice(dice_number: int) -> list:
     """Lance un certain nombre de dés
 
-    :rtype: list
-    :returns: Liste de résultat de dé
+    @param dice_number: nombre de dés à lancer
+    @rtype: list
+    @returns: Liste de résultat de dé
     """
     result = []
     for i in range(dice_number):
@@ -47,6 +46,8 @@ def roll_dice(dice_number: int) -> list:
 
 def dice():
     """Lance un dé de 6
+    
+    @rtype: int
     """
     return randint(1, 6)
 
@@ -54,8 +55,8 @@ def dice():
 def amountDiced(diceNum:int,attackAmount:int) -> int:
     """Calcule la valeur d'une attaque en fonction d'un lancer de dé
 
-    :param diceNum: Valeur du dé lancé
-    :param attackAmount: Valeur de base de la compétence 
+    @param diceNum: Valeur du dé lancé
+    @param attackAmount: Valeur de base de la compétence 
     """
     return ceil(attackAmount * diceMappings[diceNum])
 
@@ -65,15 +66,15 @@ def amountDiced(diceNum:int,attackAmount:int) -> int:
 def ask_classe():
     """Gére le choix de classe d'un utilisateur
 
-    :rtype: int
-    :returns: Entier de 0 à 3 représentant une classe
+    @rtype: int
+    @returns: Entier de 0 à 3 représentant une classe
     """
     sys.stdout.flush()
     classIndex = 0 # Placement du curseur actuelle
     while True:
-        os.system("cls"), # Permet de clear 
+        os.system("cls"), # Supprime le contenu de l'inteface
         show_classe(classIndex)
-        choix = scroll_selection(classIndex, 3)
+        choix = scroll_selection(classIndex, 3) #Selection de la classe grace au flèche directionnelle
         classIndex = choix[0]
         if choix[1] == True:
             break
@@ -85,20 +86,19 @@ def ask_classe():
 def classes_selection():
     """Gère la sélection des classes pour les deux joueurs
 
-    :rtype: list
-    :returns: Liste de deux valeurs de 0 à 3
+    @rtype: list
+    @returns: liste de deux valeurs de 0 à 3 représentant les classes choisi
     """
-    choose_class = []
-    for i in range(2):
-        choose_class.append(ask_classe())
+    choose_class = [ask_classe() for i in range(2)]
+    
     return choose_class
 
 
 def start_stat() -> list:
     """Crée les statistique de base des 2 joueurs en fonction de leur choix de classe
 
-    :rtype: list
-    :returns: Liste des statistiques (sous forme de dictionnaire)
+    @rtype: list
+    @returns: liste des statistiques (sous forme de dictionnaire)
     """
     choosen_class = classes_selection()
     players_stats_start = []
@@ -111,6 +111,9 @@ def start_stat() -> list:
 # Fonction appellé a l'utilisation d'une compétence demande les statistiques des 2 joueurs et les modifie en fonction de la compétence et d'un lancer de dé
 # Retourne les statistique des 2 joueurs
 def skillRoll(attack:tuple[str,int,dict,str], attackerStats:dict, defenderStats:dict, actual_player):
+    """Modifie les statistique des 2 joueurs en fonction d'une compétence
+
+    """
     roll = rollAndDisplayDice([attackerStats,defenderStats],actual_player)
     for i in attack[2].keys():
         if i in defenderStatsList:
@@ -126,32 +129,31 @@ def skillRoll(attack:tuple[str,int,dict,str], attackerStats:dict, defenderStats:
 
 # ----------------------------- Utilitaire ----------------------------------
 
-#Prends deux arguments et place l'espace nécéssaire pour que un élément soit à gauche l'autre soit à droite
+
 def spaceBetween(leftText:str, rightText:str) -> str:
     """Crée un texte au dimension de la fenetre en fonction de deux textes
 
-    :rtype: str
+    @rtype: str
     """
     columnsConst = os.get_terminal_size().columns - len(leftText+rightText)
     return columnsConst
 
 
-# Crée un string placé sur le centre de la fênetre de commande en fonction d'un texte
-# Retourne un texte situé sur le centre de la fênetre
 def center(string: str) -> str:
     """Centre un texte sur le centre de la fenetre
 
-    :rtype: str
-    :returns: Texte centré
+    @rtype: str
+    @returns: texte centré
     """
     return int(((os.get_terminal_size().columns / 2) - (len(string) / 2)))*" " + string
 
-# Crée des chaines de caractère pour l'affichage d'un joueur en fonction de ces statistiques
-# Retourne une liste de string pret a l'emploi
-def player_menu(player_stat:dict, player_number:int) -> str:
-    """Crée un texte de présentation des statistiques des personnages
 
-    :rtype: str
+def player_menu(player_stat:dict, player_number:int) -> str:
+    """Crée un texte de présentation des statistiques d'un personnages
+
+    @param player_stat: statistique d'un joueur
+    @rtype: str
+    @returns: texte formatté avec les statiques d'un joueur
     """
     text_result = []
 
@@ -160,11 +162,14 @@ def player_menu(player_stat:dict, player_number:int) -> str:
     text_result.append(("│ " + "Classe: " + f"{player_stat['class'].title():<11}" + "│"))
     text_result.append(("│ " +"Mana: "+ f"{player_stat['mana']:<2}"+ " HP: "+ f"{player_stat['hp']:<3}"  + 3*" "+ "│"))
     text_result.append("╰" +20*"─" + "╯")
+
     return text_result
 
-#Rolling the dice for attack roll
+#Sa dégage
 def rollAndDisplayDice(player_stats, actual_player) -> int:
-    """Crée un texte d'affichage
+    """Lance un dé et l'affiche avec une animation
+
+    @param player_stats
     """
     rolledAmount = dice()
     interface(player_stats,actual_player,f"You rolled a {rolledAmount}\nYour move is now {abs(int(diceMappings[rolledAmount]*100)-100)}% {'worse' if int(diceMappings[rolledAmount]*100)-100 < 0 else 'better'}")
@@ -172,6 +177,11 @@ def rollAndDisplayDice(player_stats, actual_player) -> int:
     return rolledAmount
 
 def chooseFirstPlayer(players_stat: list) -> list:
+    """Choisi le premier joueur et affiche le choix avec une animation
+
+    @rtype: int
+    @returns: nombre réprésentant le premier joueur (0 ou 1)
+    """
     for i in range(9):
         os.system("cls")
         dots = "."*(i%3+1)
@@ -180,19 +190,23 @@ def chooseFirstPlayer(players_stat: list) -> list:
     choosen = randint(0,1)
     if choosen == 1:
         players_stat.reverse()
-        
-    return [choosen, players_stat]
+
+    sayWhoIsFirst(choosen+1)
+    return choosen
 
 def sayWhoIsFirst(number:int):
+    """Affiche le joueur choisi
+    """
     os.system("cls")
     displayCustomMessage(f"Le premier joueur est le numéro {number}")
 
-# Permet l'affichage d'un message custom dans le format de l'affichage
-# Ne retourne rien
-def displayCustomMessage(message):
-    #Display the custom message
-    split_message = message.split("\n")
-    max_len = len(max(split_message, key=len))
+
+def displayCustomMessage(message:str):
+    """Affiche un message dans un format défini pour l'affichage (centré et encadré)
+    """
+    
+    split_message = message.split("\n") #Permet l'affichage multiligne
+    max_len = len(max(split_message, key=len)) #Trouve le nombre maximum de caractère dans une ligne
     
     print(center(("╭" + (max_len)*"─" + "╮")))
 
@@ -204,18 +218,18 @@ def displayCustomMessage(message):
 
 # Gére l'affichage d'une interface montrant toute les informations principales au joueurs
 # Ne retourne rien
-def interface(players_stat, actual_player, message:str):
+def interface(players_stat:list, actual_player:int, message:str):
+    """Affiche l'interface de jeu avec les statistiques des 2 joueurs et un message
+    """
     os.system("cls")
 
     other_player = actual_player ^1
-    actual_message = []
-    for i in player_menu(players_stat[0], actual_player):
-        actual_message.append(i)
-
-    indexVar = 0
+    actual_message = [i for i in player_menu(players_stat[0], actual_player)]
+    
+    index = 0
     for i in player_menu(players_stat[1], other_player):
-        actual_message[indexVar] += spaceBetween(actual_message[indexVar],i)*" " + i
-        indexVar += 1
+        actual_message[index] += spaceBetween(actual_message[index],i)*" " + i
+        index += 1
 
     for i in actual_message:
         print(green(i[:28]) + red(i[28:]))
@@ -224,8 +238,14 @@ def interface(players_stat, actual_player, message:str):
     displayCustomMessage(message)
 
 
-def scroll_selection(index, maxValeur):
-    char = msvcrt.getch()
+def scroll_selection(index:int, maxValeur:int):
+    """Gère une sélection par flèche et entrée
+
+    @param index: placement du curseur
+    @param maxValeur: valeur maximale
+    @returns: index mis a jour et booléen en fonction de l'appuie de entrée
+    """
+    char = msvcrt.getch() #Récupére la dernière touche du clavier
     match char:
         case b"P":
             index = min(maxValeur,index+1)
@@ -240,21 +260,26 @@ def scroll_selection(index, maxValeur):
 
 # Fonction gérant la boucle de jeu et le changement de joueur pour chaque tour
 def game_loop(players_stats:list):
-    choosen = chooseFirstPlayer(players_stats)
-    actual_player  = choosen[0]
-    players_stats = choosen[1]
-    sayWhoIsFirst(actual_player+1)
+    actual_player = chooseFirstPlayer(players_stats)
+    
     sleep(2)
     while True:
         players_stats = turn(actual_player, players_stats)
         actual_player ^= 1
         players_stats.reverse()
 
-def turn(actual_player, players_stats):
+def mana(players_stats:list, actual_player:int): 
+    """Lancement du dés de mana, ajout du résultat au mana du joueur et affichage de cet ajout
+    """
     roll = mana_roll()
     players_stats[0]["mana"] = min(players_stats[0]["topMana"],players_stats[0]["mana"] + roll[0])
     interface(players_stats, actual_player, roll[1])
     sleep(2)
+
+def turn(actual_player, players_stats):
+    
+    mana(players_stats, actual_player) 
+
     competence = None
     
     while competence == None:
