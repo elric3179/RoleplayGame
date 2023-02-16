@@ -5,31 +5,31 @@ def competences(classe) -> tuple:
     match classe:
         case "berserker":
             return (
-                ('Psychotic Style', 8, {'atthp': 10}, 'The berserker loses control, dealing 10 damage'),
-                ('Unbreakable Will', 12, {'def': 20}, 'The berserker channels their inner fury, increasing their defense by 20 points'),
-                ('Raging Storm', 15, {'atthp': 15}, 'The berserker unleashes a fierce storm of attacks, dealing 15 damage'),
-                ('Bloodlust', 30, {'hp': 25, 'atthp': 25}, 'The berserker enters a frenzied state, increasing their health and dealing damage by 25 points'),
+                ('Psychotic Style', 8, {'atthp': 10}, 'The berserker loses control, dealing value0 damage'),
+                ('Unbreakable Will', 12, {'def': 20}, 'The berserker channels their inner fury, increasing their defense by value0 points'),
+                ('Raging Storm', 15, {'atthp': 15}, 'The berserker unleashes a fierce storm of attacks, dealing value0 damage'),
+                ('Bloodlust', 30, {'hp': 25, 'atthp': 25}, 'The berserker enters a frenzied state, increasing their health and dealing damage by value0 points'),
             )
         case "mage":
             return (
-                ('Fireball', 8, {'atthp': 10}, 'The mage throws a ball of fire, dealing 10 damage'),
-                ('Ice Barrier', 12, {'def': 15}, 'The mage creates a barrier of ice, increasing their defense by 15 points'),
-                ('Lightning Bolt', 15, {'atthp': 15}, 'The mage calls down a bolt of lightning, dealing 15 damage'),
-                ('Mana Drain', 20, {'mana': 20, 'attmana': 20}, 'The mage drains the mana of their opponent, restoring their own mana by 20 points')
+                ('Fireball', 8, {'atthp': 10}, 'The mage throws a ball of fire, dealing value0 damage'),
+                ('Ice Barrier', 12, {'def': 15}, 'The mage creates a barrier of ice, increasing their defense by value0 points'),
+                ('Lightning Bolt', 15, {'atthp': 15}, 'The mage calls down a bolt of lightning, dealing value0 damage'),
+                ('Mana Drain', 20, {'hp': 20, 'attmana': 20}, 'The mage drains value1 mana of their opponent, restoring their own health by value0 points')
             )
         case "paladin":
             return (
-                ('Holy Strike', 10, {'atthp': 15}, 'The paladin strikes with holy power, dealing 15 damage'),
-                ('Divine Shield', 12, {'def': 20}, 'The paladin calls upon a divine shield, increasing their defense by 20 points'),
-                ('Heal', 8, {'hp': 20}, 'The paladin heals themselves for 20 health points'),
-                ('Divine Retribution', 20, {'atthp': 25}, 'The paladin unleashes divine retribution, dealing 25 damage')
+                ('Holy Strike', 10, {'atthp': 15}, 'The paladin strikes with holy power, dealing value0 damage'),
+                ('Divine Shield', 12, {'def': 20}, 'The paladin calls upon a divine shield, increasing their defense by value0 points'),
+                ('Heal', 8, {'hp': 20}, 'The paladin heals themselves for value0 health points'),
+                ('Divine Retribution', 20, {'atthp': 25}, 'The paladin unleashes divine retribution, dealing value0 damage')
             )
         case "archer":
             return (
-                ('Precise Shot', 8, {'atthp': 10}, 'The archer fires a precise shot, dealing 10 damage'),
-                ('Mana Boost', 12, {'mana': 8}, 'The archer boosts their mana by 8 points'),
-                ('Evasive Maneuvers', 15, {'def': 20}, 'The archer performs evasive maneuvers, increasing their defense by 20 points'),
-                ('Rain of Arrows', 20, {'atthp': 18}, 'The archer calls forth a rain of arrows, dealing 15 damage')
+                ('Precise Shot', 8, {'atthp': 10}, 'The archer fires a precise shot, dealing value0 damage'),
+                ('Mana Boost', 12, {'mana': 8}, 'The archer boosts their mana by value0 points'),
+                ('Evasive Maneuvers', 15, {'def': 20}, 'The archer performs evasive maneuvers, increasing their defense by value0 points'),
+                ('Rain of Arrows', 20, {'atthp': 18}, 'The archer calls forth a rain of arrows, dealing value0 damage')
             )
 #Recupére les stats de base d'un calsse en fonction du nom de cette classe
 #Retourne un dictionnaire sous la forme
