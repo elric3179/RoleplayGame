@@ -290,19 +290,22 @@ def play():
 def efficacite(dice_number):
     index = 0
     
-    rolled_dice = roll_dice(dice_number)
+    getCloseNumbers = roll_dice(dice_number)
+    selectedList = []
     while True:
         result = ""
-        for i in range(len(rolled_dice)):
-            if index == i:
-                result += "»" + str(rolled_dice[i])
-            else:
-                result += " " + str(rolled_dice[i])
+        selectedList, boolNext = selection(getCloseNumbers, selectedList, index, len(getCloseNumbers) - len(selectedList) - 1)
+        for i in range(len(getCloseNumbers)):
+            try:
+                result += f"{selectedList[i]} "
+            except:
+                result += "_ "
+        print(getCloseNumbers)
+        print()
         print(result)
-        #interface(players_stats, actual_player, )
         
-    
-def selection(index, max_amount):
+
+def selection(getCloseList, liste, index, max_amount):
     char = msvcrt.getch()
     match char:
         case b"P":
@@ -310,7 +313,8 @@ def selection(index, max_amount):
         case b"H ":
             index = max(0,index-1)
         case b"\n" | b"\r" | b"\r\n" | b"\n\r":
-            return index
+            return index, True
+    return index, False
 
 
 efficacite(5)
