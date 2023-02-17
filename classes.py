@@ -1,7 +1,8 @@
-#Récupére les attaques disponibles en fonction d'une classe (texte)
-#Retourne un tuple qui contient un tuple par attaque sous la forme
 #("NomCompetence", mana, num, "Description", ("Type"))
-def competences(classe) -> tuple:
+def competences(classe) -> tuple[tuple]:
+    """Récupère les compétences disponible ne fonction d'une classe
+
+    """
     match classe:
         case "berserker":
             return (
@@ -31,10 +32,11 @@ def competences(classe) -> tuple:
                 ('Evasive Maneuvers', 15, {'def': 20}, 'The archer performs evasive maneuvers, increasing their defense by value0 points'),
                 ('Rain of Arrows', 20, {'atthp': 18}, 'The archer calls forth a rain of arrows, dealing value0 damage')
             )
-#Recupére les stats de base d'un calsse en fonction du nom de cette classe
-#Retourne un dictionnaire sous la forme
+
 #{"mana": NumMana, "hp": NumHp, "def": NumDef, "topMana": NumTopMana}
 def stats(classe) -> dict:
+    """Récupére les statistique d'une classe
+    """
     match classe:
         case "berserker":
             return {"class":classe,"mana":0,"hp":100,"def":20,"topMana":40,"attacks":competences(classe)}
@@ -47,6 +49,8 @@ def stats(classe) -> dict:
 
 
 def show_classe(index:int):
+    """Affiche les classes disponibles
+    """
     red     = lambda string: "\033[1;31m" + string + "\033[0;00m"
     classes = get_classes()
     for i in range(len(classes)):
@@ -57,6 +61,8 @@ def show_classe(index:int):
 
 
 def get_classes(num=None):
+    """Récupére le nom de la classe grace au nombre qu'il la représente
+    """
     classes_name = ("berserker", "mage", "paladin", "archer")
     if num != None:
         return classes_name[num]
