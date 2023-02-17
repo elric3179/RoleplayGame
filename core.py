@@ -40,6 +40,24 @@ def dice():
     """
     return randint(1, 6)
 
+def mana(players_stats:list, actual_player:int): 
+    """Lancement du dés de mana, ajout du résultat au mana du joueur et affichage de cet ajout
+    """
+    roll = mana_roll()
+    players_stats[0]["mana"] = min(players_stats[0]["topMana"],players_stats[0]["mana"] + roll[0])
+    interface(players_stats, actual_player, roll[1])
+    sleep(2)
+
+def mana_roll():
+    """Lancement des dés de mana et affichage du résultat
+
+    @returns: résultat des dés et string a afficher 
+    """
+    dice_result = roll_dice(2)
+    total = sum(dice_result)
+    string_output = f"Lancement de dés de mana... \nVous avez obtenu {dice_result[0]} et {dice_result[1]} pour un total de {total}"
+    return (total, (string_output))
+
 
 
 # --------------------------- Gestion des classes ---------------------------
@@ -226,6 +244,30 @@ def scroll_selection(index:int, maxValeur:int):
             return index, True
     return index, False
 
+def display_competence(player_stats: dict, competenceIndex: int) -> str:
+    """Crée le texte de présentation des différentes compétences d'un joueur 
+    """
+    comp = player_stats["attacks"]
+    display_text = "Competences:"
+    for i in range(len(comp)):
+        if i == competenceIndex:
+            display_text += f"\n>: {comp[i][0]}, {convertValueInString(comp[i][3], comp[i])} ;  {comp[i][1]} mana"
+        else:
+            display_text += f"\n█: {comp[i][0]}, {convertValueInString(comp[i][3], comp[i])} ;  {comp[i][1]} mana"
+    display_text += f"\n{'>' if competenceIndex == 4 else '█'}: Keep the mana"
+    return display_text
+
+def convertValueInString(string:str, competence:dict) -> str:
+    """Affichage dynamique des statistiques dans les compétences
+
+    @returns: string modifié avec les bonnes valeurs
+    """
+    for i in range(len(competence[2].keys())):
+        string = string.replace(f"value{i}", str(competence[2][list(competence[2].keys())[i]]))
+    return string
+
+
+
 # --------------------------------- Autre -----------------------------------
 
 
@@ -243,13 +285,7 @@ def game_loop(players_stats:list):
         actual_player ^= 1
         players_stats.reverse()
 
-def mana(players_stats:list, actual_player:int): 
-    """Lancement du dés de mana, ajout du résultat au mana du joueur et affichage de cet ajout
-    """
-    roll = mana_roll()
-    players_stats[0]["mana"] = min(players_stats[0]["topMana"],players_stats[0]["mana"] + roll[0])
-    interface(players_stats, actual_player, roll[1])
-    sleep(2)
+
 
 def turn(actual_player, players_stats):
     """Gère le déroulement d'un tour
@@ -286,39 +322,7 @@ def turn(actual_player, players_stats):
             return skillRoll(players_stats[0]["attacks"][competenceIndex], players_stats[0], players_stats[1],actual_player)
 
 
-def convertValueInString(string:str, competence:dict) -> str:
-    """Affichage dynamique des statistiques dans les compétences
 
-    @returns: string modifié avec les bonnes valeurs
-    """
-    for i in range(len(competence[2].keys())):
-        string = string.replace(f"value{i}", str(competence[2][list(competence[2].keys())[i]]))
-    return string
-
-def display_competence(player_stats: dict, competenceIndex: int) -> str:
-    """Crée le texte de présentation des différentes compétences d'un joueur 
-    """
-    comp = player_stats["attacks"]
-    display_text = "Competences:"
-    for i in range(len(comp)):
-        if i == competenceIndex:
-            display_text += f"\n>: {comp[i][0]}, {convertValueInString(comp[i][3], comp[i])} ;  {comp[i][1]} mana"
-        else:
-            display_text += f"\n█: {comp[i][0]}, {convertValueInString(comp[i][3], comp[i])} ;  {comp[i][1]} mana"
-    display_text += f"\n{'>' if competenceIndex == 4 else '█'}: Keep the mana"
-    return display_text
-
-
-
-def mana_roll():
-    """Lancement des dés de mana et affichage du résultat
-
-    @returns: résultat des dés et string a afficher 
-    """
-    dice_result = roll_dice(2)
-    total = sum(dice_result)
-    string_output = f"Lancement de dés de mana... \nVous avez obtenu {dice_result[0]} et {dice_result[1]} pour un total de {total}"
-    return (total, (string_output))
     
 
 def play():
@@ -327,22 +331,10 @@ def play():
     players_stats = start_stat()
     game_loop(players_stats)
 
-def selection(index: int, maxAmount: int):
-    """Fonctionnalité de déplacement avec les fléches dirrectionnelle haut et bas
 
-    @returns: retourne l'index mis a jour et un booleen en fonctionde l'appuie de la touche entrée
+def efficacite(dice_number: int, players_stats: list, actual_player: int) -> int:
+    """Détermine le pourcentage d'éfficacité de la compétence en fonction d'une mécanique qui demande au joueur de réorganiser des résultats de dés pour se rapprocher d'un nombre donné
     """
-    char = getch()
-    match char:
-        case b"H":
-            index = min(maxAmount,index+1)
-        case b"P":
-            index = max(0,index-1)
-        case b"\n" | b"\r" | b"\r\n" | b"\n\r":
-            return index, True
-    return index, False
-
-def efficacite(dice_number, players_stats, actual_player):
     numberToReach = roll_dice(dice_number)
     numberGet = roll_dice(dice_number)
     
