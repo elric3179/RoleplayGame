@@ -122,7 +122,7 @@ def skillRoll(attack:tuple[str,int,dict,str], attackerStats:dict, defenderStats:
             if i == "mana":
                 attackerStats[i] = min(attackerStats["topMana"],attackerStats[i] + attack[2][i])
             else:
-                attackerStats[i] += attack[2][i]*efficacity
+                attackerStats[i] += int(attack[2][i]*efficacity)
 
     return [attackerStats, defenderStats]
 
