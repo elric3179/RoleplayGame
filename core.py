@@ -293,6 +293,14 @@ def turn(actual_player, players_stats):
 
     mana(players_stats, actual_player) 
 
+    competence = choose_competence(actual_player, players_stats)
+    return skillRoll(competence, players_stats[0], players_stats[1],actual_player)
+
+def choose_competence(actual_player, players_stats):
+    """Choix d'un compétence
+
+    @returns: compétence choisi
+    """
     competence = None
     while competence == None:
         competenceIndex = 0
@@ -319,9 +327,7 @@ def turn(actual_player, players_stats):
             sleep(2)
         else:
             players_stats[0]["mana"] -= players_stats[0]["attacks"][competenceIndex][1]
-            return skillRoll(players_stats[0]["attacks"][competenceIndex], players_stats[0], players_stats[1],actual_player)
-
-
+            return players_stats[0]["attacks"][competenceIndex]
 
     
 
@@ -341,8 +347,7 @@ def efficacite(dice_number: int, players_stats: list, actual_player: int) -> int
     index = 0
     selected = -1
     while True:
-        os.system("cls")
-
+        
         string = ""
         string += "Try to reach " + ("".join(map(str, numberToReach))) + " after press the backspace key"+ "\n"
         
@@ -353,6 +358,7 @@ def efficacite(dice_number: int, players_stats: list, actual_player: int) -> int
                 string += " "
             string += str(numberGet[i])
 
+        os.system("cls")
         interface(players_stats,actual_player,string)
 
         char = getch()
