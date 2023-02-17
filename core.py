@@ -1,33 +1,22 @@
 from random import randint
 from classes import *
-#Reading input from console (arrows)
 from math import ceil
 from time import sleep
-import os,msvcrt,sys
+from msvcrt import getch, kbhit
+import os,sys
 
 # ------------------------- Mapping des couleurs --------------------------
 red         = lambda string: "\033[1;31m" + string + "\033[0;00m"
 green       = lambda string: "\033[1;32m" + string + "\033[0;00m"
 darkgreen       = lambda string: "\033[0;32m" + string + "\033[0;00m"
-# ----------------------- Mapping des pourcentages ------------------------
-
-# Permet de déterminer un pourcentage d'éfficacité de l'attaque en fonction d'un résulat d'un dé
-diceMappings = {
-    1 : 0.65,
-    2 : 0.8,
-    3 : 1,
-    4 : 1,
-    5 : 1.1,
-    6 : 1.25
-}
-
-#Permet de déterminer l'éfficacité en fonction de la défense
-defenseCalculator = lambda attack, defense : attack / (1+(defense/100))
 
 # -------------------------- Gestion des stats ----------------------------
 
 attackerStatsList = ["mana","hp","def"]
 defenderStatsList = ["atthp","attmana"]
+
+#Permet de déterminer l'éfficacité en fonction de la défense
+defenseCalculator = lambda attack, defense : attack / (1+(defense/100))
 
 # --------------------------- Lancement de dés -----------------------------
 
@@ -52,13 +41,6 @@ def dice():
     return randint(1, 6)
 
 
-def amountDiced(diceNum:int,attackAmount:int) -> int:
-    """Calcule la valeur d'une attaque en fonction d'un lancer de dé
-
-    @param diceNum: Valeur du dé lancé
-    @param attackAmount: Valeur de base de la compétence 
-    """
-    return ceil(attackAmount * diceMappings[diceNum])
 
 # --------------------------- Gestion des classes ---------------------------
 
@@ -108,21 +90,21 @@ def start_stat() -> list:
 
 # ----------------------------- Competence ----------------------------------
 
-# Fonction appellé a l'utilisation d'une compétence demande les statistiques des 2 joueurs et les modifie en fonction de la compétence et d'un lancer de dé
-# Retourne les statistique des 2 joueurs
+
 def skillRoll(attack:tuple[str,int,dict,str], attackerStats:dict, defenderStats:dict, actual_player):
     """Modifie les statistique des 2 joueurs en fonction d'une compétence
 
     """
-    roll = rollAndDisplayDice([attackerStats,defenderStats],actual_player)
+    efficacity = efficacite(5, [attackerStats,defenderStats], actual_player)
+    #roll = rollAndDisplayDice([attackerStats,defenderStats],actual_player)
     for i in attack[2].keys():
         if i in defenderStatsList:
-            defenderStats[i[3:]] = max(0,defenderStats[i[3:]]-ceil(defenseCalculator(amountDiced(roll, attack[2][i]),defenderStats["def"])))
+            defenderStats[i[3:]] = max(0,defenderStats[i[3:]]-ceil(defenseCalculator(attack[2][i]*efficacity,defenderStats["def"])))
         elif i in attackerStatsList:
             if i == "mana":
                 attackerStats[i] = min(attackerStats["topMana"],attackerStats[i] + attack[2][i])
             else:
-                attackerStats[i] += amountDiced(roll, attack[2][i])
+                attackerStats[i] += attack[2][i]*efficacity
 
     return [attackerStats, defenderStats]
 
@@ -165,16 +147,7 @@ def player_menu(player_stat:dict, player_number:int) -> str:
 
     return text_result
 
-#Sa dégage
-def rollAndDisplayDice(player_stats, actual_player) -> int:
-    """Lance un dé et l'affiche avec une animation
 
-    @param player_stats
-    """
-    rolledAmount = dice()
-    interface(player_stats,actual_player,f"You rolled a {rolledAmount}\nYour move is now {abs(int(diceMappings[rolledAmount]*100)-100)}% {'worse' if int(diceMappings[rolledAmount]*100)-100 < 0 else 'better'}")
-    sleep(2)
-    return rolledAmount
 
 def chooseFirstPlayer(players_stat: list) -> list:
     """Choisi le premier joueur et affiche le choix avec une animation
@@ -216,8 +189,6 @@ def displayCustomMessage(message:str):
 
     print(center("╰" + (max_len)*"─" + "╯"))
 
-# Gére l'affichage d'une interface montrant toute les informations principales au joueurs
-# Ne retourne rien
 def interface(players_stat:list, actual_player:int, message:str):
     """Affiche l'interface de jeu avec les statistiques des 2 joueurs et un message
     """
@@ -245,7 +216,7 @@ def scroll_selection(index:int, maxValeur:int):
     @param maxValeur: valeur maximale
     @returns: index mis a jour et booléen en fonction de l'appuie de entrée
     """
-    char = msvcrt.getch() #Récupére la dernière touche du clavier
+    char = getch() #Récupére la dernière touche du clavier
     match char:
         case b"P":
             index = min(maxValeur,index+1)
@@ -258,13 +229,17 @@ def scroll_selection(index:int, maxValeur:int):
 # --------------------------------- Autre -----------------------------------
 
 
-# Fonction gérant la boucle de jeu et le changement de joueur pour chaque tour
 def game_loop(players_stats:list):
+    """Gère les tours de chaque joueur
+    """
     actual_player = chooseFirstPlayer(players_stats)
     
     sleep(2)
     while True:
         players_stats = turn(actual_player, players_stats)
+        if(players_stats[1]["hp"] == 0): # Victoire
+            print("Joueur " + str(actual_player + 1) + " a gagné") 
+            break
         actual_player ^= 1
         players_stats.reverse()
 
@@ -277,16 +252,17 @@ def mana(players_stats:list, actual_player:int):
     sleep(2)
 
 def turn(actual_player, players_stats):
-    
+    """Gère le déroulement d'un tour
+    """
+
     mana(players_stats, actual_player) 
 
     competence = None
-    
     while competence == None:
         competenceIndex = 0
         os.system("cls")
-        while msvcrt.kbhit():
-            msvcrt.getch()
+        while kbhit():
+            getch()
         interface(players_stats, actual_player, display_competence(players_stats[0], competenceIndex))
         while True:
 
@@ -299,7 +275,7 @@ def turn(actual_player, players_stats):
         if competenceIndex == None:
             pass
         elif competenceIndex == 4:
-            # Pour ne pas rentrer dans une erreur avec une cinquième compétence, qui n'existe pas
+            # Pour ne pas rentrer dans une erreur avec le fait de garder le mana
             return players_stats
         elif players_stats[0]["attacks"][competenceIndex][1] > players_stats[0]["mana"]:
             interface(players_stats,actual_player,"You do not have enough mana!")
@@ -309,13 +285,19 @@ def turn(actual_player, players_stats):
             players_stats[0]["mana"] -= players_stats[0]["attacks"][competenceIndex][1]
             return skillRoll(players_stats[0]["attacks"][competenceIndex], players_stats[0], players_stats[1],actual_player)
 
-# Ajout d'une dynamique avec les attaques
+
 def convertValueInString(string:str, competence:dict) -> str:
+    """Affichage dynamique des statistiques dans les compétences
+
+    @returns: string modifié avec les bonnes valeurs
+    """
     for i in range(len(competence[2].keys())):
         string = string.replace(f"value{i}", str(competence[2][list(competence[2].keys())[i]]))
     return string
 
-def display_competence(player_stats, competenceIndex):
+def display_competence(player_stats: dict, competenceIndex: int) -> str:
+    """Crée le texte de présentation des différentes compétences d'un joueur 
+    """
     comp = player_stats["attacks"]
     display_text = "Competences:"
     for i in range(len(comp)):
@@ -329,6 +311,10 @@ def display_competence(player_stats, competenceIndex):
 
 
 def mana_roll():
+    """Lancement des dés de mana et affichage du résultat
+
+    @returns: résultat des dés et string a afficher 
+    """
     dice_result = roll_dice(2)
     total = sum(dice_result)
     string_output = f"Lancement de dés de mana... \nVous avez obtenu {dice_result[0]} et {dice_result[1]} pour un total de {total}"
@@ -336,44 +322,17 @@ def mana_roll():
     
 
 def play():
+    """Lancement du jeu
+    """
     players_stats = start_stat()
     game_loop(players_stats)
 
+def selection(index: int, maxAmount: int):
+    """Fonctionnalité de déplacement avec les fléches dirrectionnelle haut et bas
 
-#play()
-
-def efficacite(dice_number):
-    index = 0
-    
-    numbersYouGet = roll_dice(dice_number)
-    string, getCloseNumbers = "", roll_dice(dice_number)
-    for i in roll_dice(dice_number):
-        string += f"{i} " 
-    selectionSorted = getCloseNumbers
-    selectedList = []
-    while True:
-        os.system("cls")
-        result = ""
-        for i in range(dice_number):
-            try:
-                result += f"{selectedList[i]} "
-            except:
-                if i == len(selectedList):
-                    result += f"{selectionSorted[index]} "
-                else:
-                    result += "_ "
-        print(string)
-        print()
-        print(result)
-        index, boolNext = selection(index, len(selectionSorted)-1)
-        if boolNext:
-            selectedList.append(selectionSorted[index])
-            del selectionSorted[index]
-            index = 0
-        
-
-def selection(index, maxAmount):
-    char = msvcrt.getch()
+    @returns: retourne l'index mis a jour et un booleen en fonctionde l'appuie de la touche entrée
+    """
+    char = getch()
     match char:
         case b"H":
             index = min(maxAmount,index+1)
@@ -383,5 +342,59 @@ def selection(index, maxAmount):
             return index, True
     return index, False
 
+def efficacite(dice_number, players_stats, actual_player):
+    numberToReach = roll_dice(dice_number)
+    numberGet = roll_dice(dice_number)
+    
+    index = 0
+    selected = -1
+    while True:
+        os.system("cls")
 
-efficacite(5)
+        string = ""
+        string += "Try to reach " + ("".join(map(str, numberToReach))) + " after press the backspace key"+ "\n"
+        
+        for i in range(len(numberGet)):
+            if index == i:
+                string += ">"
+            else:
+                string += " "
+            string += str(numberGet[i])
+
+        interface(players_stats,actual_player,string)
+
+        char = getch()
+        match char:
+            case b"M":
+                index = min(dice_number - 1,index+1)
+                if selected != -1:
+                    numberGet.insert(min(dice_number, selected + 2) , numberGet[selected])
+                    del numberGet[selected]
+                    selected = index
+            case b"K":
+                index = max(0,index-1)
+                if selected != -1:
+                    numberGet.insert(max(0, selected - 1) , numberGet[selected])
+                    del numberGet[selected + 1]
+                    selected = index
+            case b"\n" | b"\r" | b"\r\n" | b"\n\r":
+                if selected == -1:
+                    selected = index
+                else:
+                    selected = -1
+            case b'\x08':
+                break
+                
+    difference = abs(int("".join(map(str, numberToReach))) - int("".join(map(str, numberGet))))
+    if numberGet == numberToReach:
+        return 1.25
+    elif difference < 100:
+        return 1.1
+    elif difference < 500:
+        return 1
+    elif difference < 1500:
+        return 0.8
+    else:
+        return 0.6
+
+play()
